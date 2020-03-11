@@ -61,6 +61,7 @@ for index, vid in enumerate(video_id_list):
     r = post(progress_url, headers=header, cookies=cookie, data=data)
     r_data = r.text
     r_dict = eval(r_data)
-    if r_dict['completed'] == 'true':
-        print("{} 已经完成学习".format(title))
+    if r_dict is not None:
+        if r_dict['completed'] == 'true':
+            print("{} 已经完成学习".format(title))
     sleep(1)
