@@ -1,7 +1,6 @@
 from requests import post
 from time import sleep
 from json import load
-import json
 
 header = {
     'Accept': '*/*',
