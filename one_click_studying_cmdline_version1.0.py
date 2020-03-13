@@ -15,7 +15,7 @@ while True:
 
 print("正在打开登录页面，请登录后进入课程视频播放页面，然后回到程序输入ok继续执行")
 
-driver = webdriver.Chrome()
+driver = webdriver.Firefox()
 driver.implicitly_wait(10)
 driver.get("http://study.foton.com.cn")
 driver.maximize_window()
