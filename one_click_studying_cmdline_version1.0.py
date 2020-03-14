@@ -2,6 +2,7 @@ from selenium import webdriver
 from re import findall
 from requests import post
 from time import sleep
+import sys
 
 while True:
     print("Attention! The author is not responsible for the consequences of running this script. \nIf you agree and continue running, please enter 'yes', if you do not agree, please enter 'no' to exit.")
@@ -56,6 +57,7 @@ for div in div_list[1:]:
         title_list.append(video_title)
         if a is not None:
             print("正在爬取 {} 视频数据...".format(video_title))
+            sys.stdout.flush()
     except BaseException:
         pass
 
@@ -83,9 +85,6 @@ data = {
 template_url = "http://study.foton.com.cn/els/html/coursestudyrecord/coursestudyrecord.studyCheck.do?courseId={}&scoId={}"
 progress_url = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveProgress.do"
 
-video_id_list = []
-video_title_list = []
-
 cookie = {}
 for single_cookie in cookie_list:
     cookie[single_cookie['name']] = single_cookie['value']
@@ -103,8 +102,10 @@ for index, vid in enumerate(vid_list):
     r_data = r.text
     r_dict = eval(r_data)
     if r_dict is not None:
-        if r_dict['completed'] == 'true':
-            print("{} 已经完成学习".format(title))
+        if 'completed' in r_dict:
+            if r_dict['completed'] == 'true':
+                print("{} 已经完成学习".format(title))
+                sys.stdout.flush()
     sleep(0.2)
 
 print("恭喜你！{}课程所有视频已学习完毕".format(course_name))
