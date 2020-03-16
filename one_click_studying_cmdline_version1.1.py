@@ -16,7 +16,7 @@ while True:
         exit(0)
 
 while True:
-    print("是否要保存用户信息多次学习？是请输入1，否则输入0")
+    print("请选择模式：1.学霸模式 2.普通模式")
     label = input("请输入：")
     break
 
@@ -131,10 +131,13 @@ if label == '1':
     driver = open_broswer()
     login(driver)
     while True:
-        ok = input("请输入：")
+        ok = input("输入ok开始学习，输入no退出学习：")
         if ok == 'ok':
-            print("ok，程序继续")
-            study(driver)
+            print("ok，程序继续，开始学习")
+            try:
+                study(driver)
+            except:
+                print("该课程无法播放，请切换课程")
         elif ok == 'no':
             print("你已退出程序")
             exit(0)
@@ -150,6 +153,7 @@ else:
             study(driver)
         elif ok == 'no':
             print("你已退出程序")
+            driver.quit()
             exit(0)
         else:
             print("输入错误，重新输入")
