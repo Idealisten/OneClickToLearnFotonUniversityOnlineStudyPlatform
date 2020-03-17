@@ -171,7 +171,7 @@ def main():
             else:
                 print("输入错误，重新输入")
         else:
-            ok = input("输入ok确认当前页面课程，输入finish结束选课，输入no退出学习：")
+            ok = input("输入ok确认当前页面课程，输入finish选取当前课程并结束选课，输入no退出学习：")
             if ok == 'ok':
 
                 # 记录URL,添加到URL列表
