@@ -71,6 +71,7 @@ def study(driver):
     # c = post(video_url, headers=header, cookies=cookie)
     # print(c.status_code)
     # 单视频课程不用打开视频页面，停留在“观看视频”按钮页面只发送一个学习进度post请求即可完成学习
+    # “观看视频”按钮页面urlhttp://study.foton.com.cn/els/html/studyCourse/studyCourse.enterCourse.do?courseId=725f9cb55dfc42cea7e202a9567d4991&studyType=STUDY
     r = post(progress_url, headers=header, cookies=cookie, data=data)
     print(r.status_code)
     r_data = r.text
