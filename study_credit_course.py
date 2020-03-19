@@ -1,14 +1,18 @@
 from selenium import webdriver
-from re import findall
 from requests import post
 from time import sleep
 from sys import stdout
+from json import loads
 
 credit_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7,
                1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.9,
-               2, 2.4, 2.5, 2.6, 3, 3.5,4, 4.4, 4.5,
+               2, 2.4, 2.5, 2.6, 3, 3.5, 4, 4.4, 4.5,
                5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5,
                10, 11, 11.5, 12, 14.5, 15, 17.5]
+
+select_credit = 0
+success_study = 0
+fail_study = 0
 
 header = {
         'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -20,30 +24,41 @@ header = {
         'Host': 'study.foton.com.cn',
         'Origin': 'http://study.foton.com.cn',
         # 'Referer': 'http://study.foton.com.cn/els/flash/elnFlvPlayer.swf?v=4.0.2',
-        # http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.learn.do?courseId=912eeb688b2444ce87a6717902120f42&vb_server=&willGoStep=COURSE_COURSE_STUDY
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
         'X-Requested-With': 'XMLHttpRequest'}
 
-data = {
+data_single = {
     'courseId': 'PTC035903',
     'playTime': '9999'
 }
 
-template_url = "http://study.foton.com.cn/els/html/coursestudyrecord/coursestudyrecord.studyCheck.do?courseId={}&scoId=null"
-progress_url = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveCoursePrecent.do"
+data_double = {
+    'courseId': ' ',
+    'scoId': ' ',
+    'progress_measure': '100'
+}
+
+template_url = "http://study.foton.com.cn/els/html/coursestudyrecord/coursestudyrecord.studyCheck.do?courseId={}&scoId={}"
+progress_url = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveProgress.do"
+precent_url = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveCoursePrecent.do"
+template_watch_url = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.learn.do?courseId={}&vb_server=&willGoStep=COURSE_COURSE_STUDY"
 
 
 def open_broswer():
+    global select_credit
+
+    print("课程学分：" + str(credit_list))
+    select_credit = input("请输入要选课的学分：")
+
     print("正在打开登录页面，请登录后进入课程视频播放页面，然后回到程序输入ok继续执行")
 
-    driver = webdriver.Firefox()
     driver.implicitly_wait(10)
     driver.get("http://study.foton.com.cn")
     driver.maximize_window()
-    return driver
 
 
-def study(driver):
+def study():
+    global select_credit
     while True:
         ok = input("输入ok开始学习，输入no退出学习：")
         if ok == 'ok':
@@ -58,42 +73,84 @@ def study(driver):
     for single_cookie in cookie_list:
         cookie[single_cookie['name']] = single_cookie['value']
 
-    # http://study.foton.com.cn/els/html/studyCourse/studyCourse.enterCourse.do?courseId=725f9cb55dfc42cea7e202a9567d4991&studyType=STUDY
-    # course_id = findall(r"courseId=(.*)&studyType", driver.current_url)[0]
-    print(credit_list)
-    print("课程学分：" + str(credit_list))
-    select_credit = input("请输入要选课的学分：")
+    print(cookie)
 
+    with open('./course_data.txt', 'r', encoding='utf-8') as f:
+        line = f.readline()
+        line = f.readline()
+        while line:
+            line_list = line.strip().split(',')
+            credit = line_list[-2]
+            if credit == select_credit:
+                course_id = line_list[-3]
+                watch_url = template_watch_url.format(course_id)
 
+                print(course_id)
+                print(course_name)
+                print(watch_url)
 
+                driver.get(watch_url)
+                course_name = line_list[-4]
+                data_single['courseId'] = course_id
+                data_double['courseId'] = course_id
+                vid_list = []
+                title_list = []
+                try:
+                    # ele存在说明是双分屏或者三分屏
+                    ele = driver.find_element_by_id('vodtree')
+                except:
+                    # ele不存在说明是单分屏
+                    r = post(precent_url, headers=header, cookies=cookie, data=data_single, timeout=(15, 15))
+                    r_data = r.text
+                    r_dict = loads(r_data)
+                    if r_dict is not None:
+                        if 'completed' in r_dict:
+                            if r_dict['completed'] == 'true':
+                                print("恭喜你！《{}》 已经完成学习".format(course_name))
+                                stdout.flush()
+                else:
+                    div_list = ele.find_elements_by_tag_name('div')
+                    for div in div_list[1:]:
+                        try:
+                            a = div.find_element_by_tag_name('a')
 
-    data['courseId'] = course_id
+                        except BaseException:
+                            pass
+                        else:
+                            video_id = a.get_attribute('data-id')
+                            vid_list.append(video_id)
+                            video_title = a.get_attribute('title')
+                            title_list.append(video_title)
+                            print("正在爬取 {} 视频数据...".format(video_title))
+                            stdout.flush()
+                    print("所有视频数据爬取完成！开始学习")
 
-    ele = driver.find_element_by_class_name('info_tit')
-    em = ele.find_element_by_tag_name('em')
-    course_name = em.get_attribute('title')
-    print("课程名称是:《{}》\n".format(course_name))
+                    for index, vid in enumerate(vid_list):
+                        title = title_list[index]
+                        data_double['scoId'] = vid
+                        video_url = template_url.format(course_id, vid)
+                        post(video_url, headers=header, cookies=cookie,
+                             data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
+                        sleep(0.2)
+                        r = post(progress_url, headers=header, cookies=cookie, data=data_double, timeout=(15, 15))
+                        r_data = r.text
+                        r_dict = loads(r_data)
+                        if r_dict is not None:
+                            if 'completed' in r_dict:
+                                if r_dict['completed'] == 'true':
+                                    print("{} 已经完成学习".format(title))
+                                    stdout.flush()
+                            if 'courseProgress' in r_dict:
+                                if r_dict['courseProgress'] == "100":
+                                    print("恭喜你！{}课程所有视频已学习完毕".format(course_name))
+                        sleep(0.2)
 
-    video_url = template_url.format(course_id)
     # c = post(video_url, headers=header, cookies=cookie)
     # print(c.status_code)
-    # 单视频课程不用打开视频页面，停留在“观看视频”按钮页面只发送一个学习进度post请求即可完成学习
-    # “观看视频”按钮页面url http://study.foton.com.cn/els/html/studyCourse/studyCourse.enterCourse.do?courseId=725f9cb55dfc42cea7e202a9567d4991&studyType=STUDY
-    r = post(progress_url, headers=header, cookies=cookie, data=data)
-    print(r.status_code)
-    r_data = r.text
-    print(r_data)
-    r_dict = eval(r_data)
-    if r_dict is not None:
-        if 'completed' in r_dict:
-            if r_dict['completed'] == 'true':
-                print("恭喜你！{} 已经完成学习".format(course_name))
-                stdout.flush()
-    else:
-        print("该课程无法学习，请切换课程")
-    driver.quit()
 
 
 if __name__ == "__main__":
-    study(open_broswer())
-
+    driver = webdriver.Firefox()
+    open_broswer()
+    study()
+    driver.quit()
