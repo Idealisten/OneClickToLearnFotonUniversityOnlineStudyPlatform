@@ -1,14 +1,24 @@
 # Response {"message":"操作成功！","status":"200","success":true,"jsonObj":null}
-from selenium import webdriver
+
+# 必须把course_data.txt放在本程序同级目录下
 from requests import post
 from selenium import webdriver
 from time import sleep
 from json import loads
 
 success_num = 0
+fail_num = 0
+
+credit_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7,
+               1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.9,
+               2, 2.4, 2.5, 2.6, 3, 3.5,4, 4.4, 4.5,
+               5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5,
+               10, 11, 11.5, 12, 14.5, 15, 17.5]
 
 account = input("请输入用户名：")
 password = input("请输入密码：")
+print("课程学分：" + str(credit_list))
+select_credit = input("请输入要选课的学分：")
 
 driver = webdriver.Firefox()
 driver.implicitly_wait(10)
@@ -23,7 +33,7 @@ passwd = driver.find_element_by_id('password')
 passwd.click()
 passwd.send_keys(password)
 
-sleep(1)
+sleep(2)
 
 ele = driver.find_element_by_class_name('login_Btn')
 ele.click()
@@ -53,12 +63,40 @@ for single_cookie in cookie_list:
 
 choose_url = 'http://study.foton.com.cn/els/html/courseCenter/courseCenter.chooseCourse.do'
 
-r = post(choose_url, headers=header, cookies=cookie, data=data)
+with open('./course_data.txt', 'r', encoding='utf-8') as f:
+    line = f.readline()
+    line = f.readline()
+    while line:
+        line_list = line.strip().split(',')
+        completion = line_list[-1]
+        credit = line_list[-2]
+        course_id = line_list[-3]
+        course_name = line_list[-4]
+        if (completion != "课后测试") and (credit == select_credit):
+            data['courseId'] = course_id
+            try:
+                r = post(choose_url, headers=header, cookies=cookie, data=data, timeout=(15, 15))
+                r_code = r.status_code
+            except:
+                fail_num += 1
+                print("《{}》选课失败!共选课失败 {} 门".format(course_name, fail_num))
+                r_code = -1
+            if r.status_code == 200:
+                r_data = r.text
+                r_dict = loads(r_data)
+                if "success" in r_dict:
+                    if r_dict["success"]:
+                        success_num += 1
+                        print("《{}》选课成功!共选课成功 {} 门".format(course_name, success_num))
+        line = f.readline()
 
-r_data = r.text
-r_dict = loads(r_data)
+print("\n")
+print("共选课失败 {} 门".format(fail_num))
+print("共选课成功 {} 门".format(success_num))
+driver.quit()
 
-if "success" in r_dict:
-    if r_dict["success"]:
-        success_num += 1
-        print("选课成功!已经成功选课 {} 门".format(success_num))
+
+
+
+
+
