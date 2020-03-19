@@ -4,6 +4,7 @@ from requests import post
 from time import sleep
 from sys import stdout
 from os.path import exists
+from json import loads
 
 
 def open_broswer():
@@ -100,15 +101,16 @@ def study(driver):
         sleep(1)
         r = post(progress_url, headers=header, cookies=cookie, data=data)
         r_data = r.text
-        r_dict = eval(r_data)
+        r_dict = loads(r_data)
         if r_dict is not None:
             if 'completed' in r_dict:
                 if r_dict['completed'] == 'true':
                     print("{} 已经完成学习".format(title))
                     stdout.flush()
+            if 'courseProgress' in r_dict:
+                if r_dict['courseProgress'] == '100':
+                    print("恭喜你！{}课程所有视频已学习完毕".format(course_name))
         sleep(0.2)
-
-    print("恭喜你！{}课程所有视频已学习完毕".format(course_name))
 
 
 def main():
