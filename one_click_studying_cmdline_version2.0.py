@@ -116,16 +116,6 @@ def study(driver):
 def main():
     url_list = []
     s = 0
-    while True:
-        print(
-            "Attention! The author is not responsible for the consequences of running this script. \nIf you agree and continue running, please enter 'yes', if you do not agree, please enter 'no' to exit.")
-        yes = input("Please enter your choice:")
-        if yes == "yes":
-            print("You have agreed. Program continues execution...")
-            break
-        else:
-            print("You have refused. Goodbye~")
-            exit(0)
 
     while True:
         print("请选择模式：1.普通模式 2.学霸模式 3.终极模式")
