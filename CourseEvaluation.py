@@ -110,7 +110,7 @@ def end_study():
 if __name__ == "__main__":
     print("课程学分：" + str(credit_list))
     select_credit = input("请输入要评估的课程的学分：")
-    if str(select_credit) not in credit_list:
+    if int(select_credit) not in credit_list:
         print("输入错误。告辞")
         exit(0)
     else:
