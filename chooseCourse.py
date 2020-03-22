@@ -40,8 +40,10 @@ credit_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7,
 
 account = input("请输入用户名：")
 password = input("请输入密码：")
+
 print("课程学分：" + str(credit_list))
 select_credit = input("请输入要选课的学分：")
+
 if int(select_credit) not in credit_list:
     print("输入错误。告辞")
     exit(0)
