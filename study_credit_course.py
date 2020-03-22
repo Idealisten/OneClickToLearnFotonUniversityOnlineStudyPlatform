@@ -54,7 +54,6 @@ template_play_url = "http://study.foton.com.cn/els/html/studyCourse/studyCourse.
 
 def open_broswer():
     print("正在打开登录页面，请登录后回到程序输入ok继续执行")
-
     driver.implicitly_wait(10)
     driver.get("http://study.foton.com.cn")
     driver.maximize_window()
@@ -219,7 +218,7 @@ def end_study():
 if __name__ == "__main__":
     print("课程学分：" + str(credit_list))
     select_credit = input("请输入要学习的课程的学分：")
-    if str(select_credit) not in credit_list:
+    if int(select_credit) not in credit_list:
         print("输入错误。告辞")
         exit(0)
     else:
