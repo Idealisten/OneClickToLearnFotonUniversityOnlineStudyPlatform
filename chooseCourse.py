@@ -44,7 +44,7 @@ password = input("请输入密码：")
 print("课程学分：" + str(credit_list))
 select_credit = input("请输入要选课的学分：")
 
-if int(select_credit) not in credit_list:
+if float(select_credit) not in credit_list:
     print("输入错误。告辞")
     exit(0)
 else:
