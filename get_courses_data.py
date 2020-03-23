@@ -61,9 +61,10 @@ def find_courses_data():
                 last_page = int(chrome.find_element_by_class_name('pagnum-last').text)
             except:
                 last_page = 1
-            for i in range(last_page-1):
+            for i in range(1, last_page+1):
                 cp = 1
                 # ele = chrome.find_element_by_id('categoryFilterResult')
+                time.sleep(1)
                 ele = WebDriverWait(chrome, 15, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'categoryFilterResult'))
                 )
@@ -75,9 +76,8 @@ def find_courses_data():
                 li_list = WebDriverWait(ul, 15, 0.5).until(
                     EC.presence_of_all_elements_located((By.TAG_NAME, 'li'))
                 )
-                time.sleep(2)
                 for li in li_list:
-
+                    time.sleep(0.2)
                     # div = li.find_element_by_class_name('list-p')
                     div = WebDriverWait(li, 15, 0.5).until(
                         EC.presence_of_element_located((By.CLASS_NAME, 'list-p')))
@@ -96,7 +96,6 @@ def find_courses_data():
                     f.write(',')
                     completion = div.find_element_by_class_name('coursebrief').find_element_by_tag_name('em').text
                     f.write(completion + '\n')
-                time.sleep(3)
                 if last_page > 1:
                     if cp < last_page:
                         # next_page = chrome.find_element_by_class_name('pag-next-page')
@@ -104,7 +103,7 @@ def find_courses_data():
                             EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, '下一页')))
                         next_page.click()
                         cp += 1
-                time.sleep(3)
+                        time.sleep(3)
 
 
 if __name__ == "__main__":
