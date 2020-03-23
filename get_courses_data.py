@@ -30,7 +30,7 @@ def login():
 
 
 def find_courses_data():
-    with open('course_data.txt', 'w', encoding='uft-8') as f:
+    with open('course_data.txt', 'w', encoding='utf-8') as f:
         f.write('课程名称,')
         f.write('课程ID,')
         f.write('课程学分,')
