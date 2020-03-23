@@ -91,7 +91,7 @@ def find_courses_data():
                     detial_list = div.find_elements_by_class_name('learndetail')
                     detial_credit = detial_list[0]
                     # 这里的credit是str类型
-                    credit = detial_credit.find_element_by_tag_name('span').find_element_by_tag_name('em').text
+                    credit = detial_credit.find_elements_by_tag_name('span')[1].find_element_by_tag_name('em').text
                     f.write(credit)
                     f.write(',')
                     completion = div.find_element_by_class_name('coursebrief').find_element_by_tag_name('em').text
