@@ -23,7 +23,7 @@ template_evaluation_url = "http://study.foton.com.cn/els/html/studyCourse/studyC
 
 def judge():
     while True:
-        ok = input("输入ok开始学习，输入no退出学习：")
+        ok = input("输入ok开始评估，输入no退出评估：")
         if ok == 'ok':
             break
         else:
