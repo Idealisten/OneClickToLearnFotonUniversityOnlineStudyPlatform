@@ -8,6 +8,7 @@ from requests import post
 from time import sleep
 from json import loads
 from re import findall
+import time
 
 # 保存视频播放进度
 save_progress_api = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveProgress.do"
@@ -23,12 +24,13 @@ study_check_api_tmp = "http://study.foton.com.cn/els/html/coursestudyrecord/cour
 scols_complate_api_tmp = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.scoIsComplate.do?courseId={}&processType=THREESCREEN"
 
 course_id_list = []
-cookie = []
+cookie = {}
 course_info_list = []
 completed_list = []
 video_id_list = []
 video_name_list = []
 course_url_list = []
+course_name = ''
 
 header = {
     'Accept': '*/*',
@@ -50,6 +52,14 @@ data = {
         'progress_measure': '100'
     }
 
+select_video_data = {
+    'courseId': '',
+    'scoId': '',
+    'firstLoad': 'true',
+    'Location': '0',
+    'elsSign': ''
+}
+
 
 def open_broswer():
     print("正在打开登录页面，请登录后进入课程视频播放页面，然后回到程序继续执行")
@@ -65,8 +75,8 @@ def select_course():
         ok = input("输入ok选择当前课程，输入end结束选课，输入no退出：")
         if ok == 'ok':
             get_courseId()
-        elif ok == 'no':
-            print("选课结束，本次共选择了{}门课".format(len(course_id_list)))
+        elif ok == 'end':
+            print("选课结束，本次共选择了{}门课\n".format(len(course_id_list)))
             break
         else:
             print("告辞")
@@ -90,20 +100,30 @@ def get_cookie():
         cookie[single_cookie['name']] = single_cookie['value']
 
 
+def show_time():
+    print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+
+
 def load_course(course_id):
     """
     加载课程信息，课程名称，视频名称，视频ID
     """
     global course_info_list
-    loaded = post(load_course_api, headers=header, cookies=cookie,
-                  data={'elsSign': cookie['eln_session_id'], 'courseId': course_id})
-    course_info_orign = loads(loaded.text)
-    course_name = course_info_orign[0]['text']
-    print("课程名称是:《{}》\n".format(course_name))
-    course_info_list = course_info_orign[0]['children'][0]['children']
-    for course_info in course_info_list:
-        video_id_list.append(course_info['id'])
-        video_name_list.append(course_info['text'])
+    global course_name
+    try:
+        loaded = post(load_course_api, headers=header, cookies=cookie,
+                  data={'elsSign': cookie['eln_session_id'], 'courseId': course_id}, timeout=(15, 15))
+    except:
+        print("加载视频信息出错")
+    else:
+        course_info_orign = loads(loaded.text)
+        course_name = course_info_orign[0]['text']
+        show_time()
+        print("课程名称是:《{}》，开始学习 ".format(course_name))
+        course_info_list = course_info_orign[0]['children'][0]['children']
+        for course_info in course_info_list:
+            video_id_list.append(course_info['id'])
+            video_name_list.append(course_info['text'])
 
 
 def get_completed_video_list(course_id):
@@ -112,9 +132,21 @@ def get_completed_video_list(course_id):
     """
     global completed_list
     scols_complate_api = scols_complate_api_tmp.format(course_id)
-    c = post(scols_complate_api, headers=header, cookies=cookie,
-             data={'elsSign': cookie['eln_session_id']})
-    completed_list = loads(c.text)
+    try:
+        c = post(scols_complate_api, headers=header, cookies=cookie,
+                 data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
+    except:
+        print("获取视频完成列表出错")
+    else:
+        if len(c.text) != 0:
+            completed_list = loads(c.text)
+
+
+def select_video(course_id, video_id):
+    select_video_data['elsSign'] = cookie['eln_session_id']
+    post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
+    study_check_api = study_check_api_tmp.format(course_id, video_id)
+    post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
 
 
 def course_finished():
@@ -131,16 +163,26 @@ def video_finished():
     """
     判断视频是否播放完毕
     """
-    r = post(save_progress_api, headers=header, cookies=cookie, data=data)
-    r_data = r.text
-    r_dict = loads(r_data)
-    if r_dict is not None:
-        if r_dict['completed'] == 'true':
-            return True
+    try:
+        r = post(save_progress_api, headers=header, cookies=cookie, data=data, timeout=(15, 15))
+    except:
+        print("获取视频播放进度时出错")
+    else:
+        r_data = r.text
+
+        print(r.text)
+
+        if len(r_data) != 0:
+            r_dict = loads(r_data)
+            if 'completed' in r_dict:
+                if r_dict['completed'] == 'true':
+                    return True
+                else:
+                    return False
+            else:
+                return False
         else:
             return False
-    else:
-        return False
 
 
 def study():
@@ -150,24 +192,35 @@ def study():
         course_id = course_id_list[i]
         get_cookie()
         load_course(course_id)
-        get_completed_video_list()
+        select_video_data['courseId'] = course_id
+        get_completed_video_list(course_id)
         if course_finished():
+            show_time()
+            print("《{}》课程全部视频学习完毕".format(course_name))
             continue
         else:
             for j, video_id in enumerate(video_id_list):
                 video_name = video_name_list[j]
+                show_time()
+                print("开始学习 {} 视频".format(video_name))
                 data['courseId'] = course_id
                 data['scoId'] = video_id
+                select_video_data['scoId'] = video_id
+                select_video(course_id, video_id)
                 while True:
                     if video_finished():
-                        # 进入下一个视频
-
+                        show_time()
+                        print("{} 视频学习完毕".format(video_name))
                         break
                     else:
-                        sleep(60)
+                        post(update_time_api, headers=header, cookies=cookie,
+                             data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
+                        sleep(180)
 
 
 if __name__ == "__main__":
     driver = webdriver.Firefox()
     driver.implicitly_wait(10)
     open_broswer()
+    study()
+    driver.quit()
