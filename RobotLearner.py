@@ -171,7 +171,7 @@ def video_finished():
         r_data = r.text
 
         print(r.text)
-
+        # 学完了也会返回空值，需要根据已学完列表进入下一节
         if len(r_data) != 0:
             r_dict = loads(r_data)
             if 'completed' in r_dict:
