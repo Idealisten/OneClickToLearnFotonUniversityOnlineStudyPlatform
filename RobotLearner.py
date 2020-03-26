@@ -170,6 +170,7 @@ def video_finished(course_id, video_id):
     data['courseId'] = course_id
     data['scoId'] = video_id
     get_completed_video_list(course_id)
+
     if video_id in completed_list:
         return True
     try:
@@ -229,11 +230,14 @@ def study():
                         post(update_time_api, headers=header, cookies=cookie,
                              data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
                         sleep(180)
+                if course_finished():
+                    show_time()
+                    print("《{}》课程全部视频学习完毕".format(course_name))
 
 
 if __name__ == "__main__":
-    # driver = webdriver.Firefox()
-    driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
+    # driver = webdriver.Chrome()
     driver.implicitly_wait(10)
     open_broswer()
     study()
