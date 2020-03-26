@@ -49,7 +49,9 @@ header = {
 data = {
         'courseId': '',
         'scoId': '',
-        'progress_measure': '100'
+        'progress_measure': '100',
+        'session_time': '60:01',
+        'location': '3601'
     }
 
 select_video_data = {
@@ -143,6 +145,8 @@ def get_completed_video_list(course_id):
 
 
 def select_video(course_id, video_id):
+    select_video_data['courseId'] = course_id
+    select_video_data['scoId'] = video_id
     select_video_data['elsSign'] = cookie['eln_session_id']
     post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
     study_check_api = study_check_api_tmp.format(course_id, video_id)
@@ -159,10 +163,14 @@ def course_finished():
         return False
 
 
-def video_finished():
+def video_finished(course_id, video_id):
     """
     判断视频是否播放完毕
     """
+    data['courseId'] = course_id
+    data['scoId'] = video_id
+    if video_id in completed_list:
+        return True
     try:
         r = post(save_progress_api, headers=header, cookies=cookie, data=data, timeout=(15, 15))
     except:
@@ -171,16 +179,24 @@ def video_finished():
         r_data = r.text
 
         print(r.text)
-        # 学完了也会返回空值，需要根据已学完列表进入下一节
+
         if len(r_data) != 0:
-            r_dict = loads(r_data)
-            if 'completed' in r_dict:
-                if r_dict['completed'] == 'true':
-                    return True
+            print(r_data)
+            try:
+                r_dict = loads(r_data)
+            except:
+                print("HTTP Status 500  服务器内部错误")
+            else:
+                if 'completed' in r_dict:
+                    if r_dict['completed'] == 'true':
+                        return True
+                    else:
+                        show_time()
+                        print("视频播放进度{}%，课程学习进度{}%".format(
+                            r_dict['completeRate'], r_dict['courseProgress']))
+                        return False
                 else:
                     return False
-            else:
-                return False
         else:
             return False
 
@@ -192,7 +208,6 @@ def study():
         course_id = course_id_list[i]
         get_cookie()
         load_course(course_id)
-        select_video_data['courseId'] = course_id
         get_completed_video_list(course_id)
         if course_finished():
             show_time()
@@ -203,12 +218,9 @@ def study():
                 video_name = video_name_list[j]
                 show_time()
                 print("开始学习 {} 视频".format(video_name))
-                data['courseId'] = course_id
-                data['scoId'] = video_id
-                select_video_data['scoId'] = video_id
                 select_video(course_id, video_id)
                 while True:
-                    if video_finished():
+                    if video_finished(course_id, video_id):
                         show_time()
                         print("{} 视频学习完毕".format(video_name))
                         break
@@ -219,7 +231,8 @@ def study():
 
 
 if __name__ == "__main__":
-    driver = webdriver.Firefox()
+    # driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
     driver.implicitly_wait(10)
     open_broswer()
     study()
