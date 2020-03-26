@@ -169,6 +169,7 @@ def video_finished(course_id, video_id):
     """
     data['courseId'] = course_id
     data['scoId'] = video_id
+    get_completed_video_list(course_id)
     if video_id in completed_list:
         return True
     try:
