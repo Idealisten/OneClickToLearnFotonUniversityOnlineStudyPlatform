@@ -124,6 +124,7 @@ def load_course(course_id):
         print("课程名称是:《{}》，开始学习 ".format(course_name))
         course_info_list = course_info_orign[0]['children'][0]['children']
         for course_info in course_info_list:
+            # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
             video_id_list.append(course_info['id'])
             video_name_list.append(course_info['text'])
 
@@ -203,6 +204,13 @@ def video_finished(course_id, video_id):
             return False
 
 
+def clear_list():
+    video_id_list.clear()
+    video_name_list.clear()
+    completed_list.clear()
+    course_info_list.clear()
+
+
 def study():
     select_course()
     for i, course_url in enumerate(course_url_list):
@@ -214,6 +222,7 @@ def study():
         if course_finished():
             show_time()
             print("《{}》课程全部视频学习完毕".format(course_name))
+            clear_list()
             continue
         else:
             for j, video_id in enumerate(video_id_list):
@@ -233,6 +242,7 @@ def study():
                 if course_finished():
                     show_time()
                     print("《{}》课程全部视频学习完毕".format(course_name))
+                    clear_list()
 
 
 if __name__ == "__main__":
