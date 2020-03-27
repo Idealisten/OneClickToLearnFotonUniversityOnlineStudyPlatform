@@ -181,10 +181,10 @@ def video_finished(course_id, video_id):
     else:
         r_data = r.text
 
-        print(r.text)
+        # print(r.text)
 
         if len(r_data) != 0:
-            print(r_data)
+            # print(r_data)
             try:
                 r_dict = loads(r_data)
             except:
@@ -211,11 +211,19 @@ def clear_list():
     course_info_list.clear()
 
 
+def print_list():
+    print(video_id_list)
+    print(video_name_list)
+    print(completed_list)
+    print(course_info_list)
+
+
 def study():
     select_course()
     for i, course_url in enumerate(course_url_list):
         driver.get(course_url)
         course_id = course_id_list[i]
+        # print(course_id)
         get_cookie()
         load_course(course_id)
         get_completed_video_list(course_id)
@@ -239,10 +247,12 @@ def study():
                         post(update_time_api, headers=header, cookies=cookie,
                              data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
                         sleep(180)
+                get_completed_video_list(course_id)
                 if course_finished():
                     show_time()
                     print("《{}》课程全部视频学习完毕".format(course_name))
                     clear_list()
+            clear_list()
 
 
 if __name__ == "__main__":
