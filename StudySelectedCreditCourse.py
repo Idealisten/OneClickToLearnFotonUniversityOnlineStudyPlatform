@@ -82,6 +82,36 @@ def judge():
             exit(0)
 
 
+def pre_test():
+    form = driver.find_element_by_id("coursePretestForm")
+    try:
+        h2 = form.find_element_by_tag_name("h2")
+    except:
+        form_choice = driver.find_element_by_class_name("form_choice")
+        # choice_type_list = form_choice.find_elements_by_class_name("choice_type")
+        # for choice_type in choice_type_list:
+        # if choice_type.text == "判断题":
+        # 判断题/选择题(单选，多选)都只需要循环点question-item的第一个选项就行了
+        question_item_list = form_choice.find_elements_by_class_name("question-item")
+        for question_item in question_item_list:
+            p_list = question_item.find_elements_by_tag_name("p")
+            span = p_list[1].find_element_by_tag_name("span")
+            button = span.find_element_by_tag_name("input")
+            button.click()
+            sleep(0.1)
+        from_confirm = driver.find_element_by_class_name("from_confirm")
+        submit_button = from_confirm.find_element_by_id("coursePretestSubmit")
+        submit_button.click()
+
+        next_step = driver.find_element_by_id("upCoursePretestGoNextBtn")
+        next_step.click()
+        learn()
+    else:
+        if h2.text == "（无试题）":
+            button = driver.find_element_by_class_name("from_confirm").find_element_by_tag_name("button")
+            button.click()
+
+
 def is_finished():
     global success_num
     try:
@@ -103,6 +133,8 @@ def is_finished():
             if span.text == "课程评估":
                 success_num += 1
                 print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
+            elif span.text == "课前测试":
+                pre_test()
 
     else:
         if span.text == '100':
