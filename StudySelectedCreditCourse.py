@@ -110,6 +110,7 @@ def pre_test():
         if h2.text == "（无试题）":
             button = driver.find_element_by_class_name("from_confirm").find_element_by_tag_name("button")
             button.click()
+            learn()
 
 
 def is_finished():
