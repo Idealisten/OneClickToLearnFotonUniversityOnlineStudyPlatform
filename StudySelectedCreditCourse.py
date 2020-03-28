@@ -136,6 +136,9 @@ def is_finished():
                 print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
             elif span.text == "课前测试":
                 pre_test()
+            elif span.text == "课后测试":
+                success_num += 1
+                print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
 
     else:
         if span.text == '100':
@@ -267,9 +270,11 @@ if __name__ == "__main__":
             driver.switch_to.window(driver.window_handles[0])
             driver.get(play_url)
             sleep(1)
+            print("开始学习《{}》：".format(course_name))
             try:
                 is_finished()
             except:
+                fail_num += 1
                 print("请检查《{}》是否已选课！".format(course_name))
         driver.quit()
         end_study()

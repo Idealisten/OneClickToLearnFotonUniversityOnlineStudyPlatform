@@ -89,7 +89,7 @@ else:
             credit = line_list[-2]
             course_id = line_list[-3]
             course_name = line_list[-4]
-            if (completion != "课后测试") and (credit == select_credit):
+            if credit == select_credit:
                 data['courseId'] = course_id
                 all_num += 1
                 try:
