@@ -262,19 +262,22 @@ if __name__ == "__main__":
         driver = webdriver.Firefox()
         open_broswer()
         judge()
-        for course_info in course_info_list:
+        for c, course_info in enumerate(course_info_list):
             course_line_list = course_info.strip().split(',')
             course_id = course_line_list[-3]
             course_name = course_line_list[-4]
             play_url = template_play_url.format(course_id)
             driver.switch_to.window(driver.window_handles[0])
             driver.get(play_url)
+            if c % 100 == 0:
+                get_cookie()
             sleep(1)
             print("开始学习《{}》：".format(course_name))
             try:
                 is_finished()
             except:
                 fail_num += 1
+                fail_list.append(course_name)
                 print("请检查《{}》是否已选课！".format(course_name))
         driver.quit()
         end_study()
