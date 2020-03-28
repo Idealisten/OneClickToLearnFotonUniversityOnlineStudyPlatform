@@ -252,7 +252,9 @@ def study():
                     show_time()
                     print("《{}》课程全部视频学习完毕".format(course_name))
                     clear_list()
+                sleep(1)
             clear_list()
+        sleep(1)
 
 
 if __name__ == "__main__":
