@@ -106,12 +106,13 @@ def show_time():
     print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
 
 
-def load_course(course_id):
+def load_course(course_id, ):
     """
     加载课程信息，课程名称，视频名称，视频ID
     """
     global course_info_list
     global course_name
+
     try:
         loaded = post(load_course_api, headers=header, cookies=cookie,
                   data={'elsSign': cookie['eln_session_id'], 'courseId': course_id}, timeout=(15, 15))
@@ -123,13 +124,31 @@ def load_course(course_id):
         show_time()
         print("课程名称是:《{}》，开始学习 ".format(course_name))
         # 一部分在[0]['children']['0']['children']，另一部分课程在['0']['children']下
-        course_info_list = course_info_orign[0]['children'][0]['children']
-        if len(course_info_list) == 1:
+
+        # print(course_info_orign[0]['children'][0]['children'])
+        # print(course_info_orign[0]['children'])
+
+        if len(course_info_orign[0]['children'][0]['children']) == 1:
             course_info_list = course_info_orign[0]['children']
-        for course_info in course_info_list:
-            # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
-            video_id_list.append(course_info['id'])
-            video_name_list.append(course_info['text'])
+            c = True
+        else:
+            course_info_list = course_info_orign[0]['children'][0]['children']
+            c = False
+
+        # print(course_info_list)
+
+        if not c:
+            for course_info in course_info_list:
+                # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
+                video_id_list.append(course_info['id'])
+                video_name_list.append(course_info['text'])
+        else:
+            for course_info in course_info_list:
+                video_id_list.append(course_info['children'][0]['id'])
+                video_name_list.append(course_info['children'][0]['text'])
+
+        # print(video_id_list)
+        # print(video_name_list)
 
 
 def get_completed_video_list(course_id):
@@ -175,6 +194,10 @@ def video_finished(course_id, video_id):
     data['scoId'] = video_id
     get_completed_video_list(course_id)
 
+    # print(course_id)
+    # print(video_id)
+    # print(completed_list)
+
     if video_id in completed_list:
         return True
     try:
@@ -187,7 +210,9 @@ def video_finished(course_id, video_id):
         # print(r.text)
 
         if len(r_data) != 0:
+
             # print(r_data)
+
             try:
                 r_dict = loads(r_data)
             except:
