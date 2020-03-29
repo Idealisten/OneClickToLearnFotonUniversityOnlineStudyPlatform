@@ -101,7 +101,7 @@ def make_after_test(course_name):
                     success_num += 1
                 else:
                     # 进行补考，点查看结果，记录答案
-                    print("开始补考")
+                    print("开始记录答案")
                     div = message.find_elements_by_tag_name("div")[1]
                     courseExamMsgViewBtn = div.find_element_by_id("courseExamMsgViewBtn")
                     courseExamMsgViewBtn.click()
@@ -113,13 +113,13 @@ def make_after_test(course_name):
                     question_text_list = []
                     for j, question_item in enumerate(question_item_list):
                         print("正在记录第{}题".format(j+1))
-                        sleep(0.2)
+                        sleep(0.5)
                         # 还得去掉题目前的序号和点
                         answers_text_list = []
                         question = question_item.find_element_by_class_name("choice_tit").text.split(" ")[-1]
                         choice_list = question_item.find_elements_by_tag_name("p")[1:]
                         for c, choice in enumerate(choice_list):
-                            sleep(0.2)
+                            sleep(0.5)
                             try:
                                 image = choice.find_element_by_tag_name("img")
                             except:
@@ -134,25 +134,32 @@ def make_after_test(course_name):
                     makeup_exam = driver.find_element_by_class_name("from_confirm").find_element_by_tag_name("button")
                     makeup_exam.click()
                     sleep(1)
+                    print("开始补考")
                     courseInfoForm = driver.find_element_by_id("courseInfoForm")
                     form_choice = courseInfoForm.find_element_by_class_name("form_choice")
                     question_item_list = form_choice.find_elements_by_class_name("question-item")
                     for k, question_item in enumerate(question_item_list):
                         print("正在补考第{}题".format(k+1))
-                        sleep(0.2)
+                        sleep(0.5)
                         makeup_question_text = question_item.find_element_by_class_name("choice_tit").text.split(" ")[-1]
                         for i, question_text in enumerate(question_text_list):
-                            sleep(0.2)
+                            sleep(0.5)
                             if makeup_question_text in question_text:
                                 correct_answer_list = question_text_list[i].get(makeup_question_text)
                                 choice_list = question_item.find_elements_by_tag_name("p")[1:]
                                 for choice in choice_list:
-                                    sleep(0.2)
+                                    sleep(0.5)
                                     span = choice.find_element_by_tag_name("span")
                                     label = span.find_element_by_tag_name("label")
                                     answer = label.text
                                     if answer in correct_answer_list:
                                         label.click()
+                            else:
+                                print("该题目 {} 在第一次测试时未出现，没有记录正确答案".format(makeup_question_text))
+                                choice_list = question_item.find_elements_by_tag_name("p")[1:]
+                                span = choice.find_element_by_tag_name("span")
+                                label = span.find_element_by_tag_name("label")
+                                label.click()
                     from_confirm = driver.find_element_by_class_name("from_confirm")
                     goNext = from_confirm.find_element_by_id("goNext")
                     goNext.click()
