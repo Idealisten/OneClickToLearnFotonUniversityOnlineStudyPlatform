@@ -122,7 +122,10 @@ def load_course(course_id):
         course_name = course_info_orign[0]['text']
         show_time()
         print("课程名称是:《{}》，开始学习 ".format(course_name))
+        # 一部分在[0]['children']['0']['children']，另一部分课程在['0']['children']下
         course_info_list = course_info_orign[0]['children'][0]['children']
+        if len(course_info_list) == 1:
+            course_info_list = course_info_orign[0]['children']
         for course_info in course_info_list:
             # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
             video_id_list.append(course_info['id'])
