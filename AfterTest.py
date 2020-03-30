@@ -36,7 +36,7 @@ def open_broswer():
     driver.get("http://study.foton.com.cn")
     driver.maximize_window()
 
-'''
+
 def load_course():
     global select_credit
     with open('./course_data.txt', 'r', encoding='utf-8') as f:
@@ -49,11 +49,13 @@ def load_course():
             if credit == select_credit and qualification == "课后测试":
                 course_info_list.append(line)
             line = f.readline()
-'''
+
 
 def make_after_test(course_name):
     global success_num
     global fail_num
+    questions_list = []
+    correct_answers_list = []
     try:
         # 弹出提示框：考试时间还剩5分钟，抓紧时间。需要点确定
         abcenter_inner = driver.find_element_by_class_name("abcenter_inner")
@@ -105,7 +107,7 @@ def make_after_test(course_name):
                     sleep(1)
                     success_num += 1
                 else:
-                    # 进行补考，点查看结果，记录答案
+                    # 点查看结果，记录答案
                     print("开始记录答案")
                     div = message.find_elements_by_tag_name("div")[1]
                     courseExamMsgViewBtn = div.find_element_by_id("courseExamMsgViewBtn")
@@ -127,6 +129,7 @@ def make_after_test(course_name):
                             question = question + q
                             if x < len(original_question_list)-1:
                                 question = question + " "
+                        questions_list.append(question)
 
                         print(question)
 
@@ -146,9 +149,10 @@ def make_after_test(course_name):
 
                         print(answers_text_list)
 
-                        question_text_list.append({question: answers_text_list})
+                        # question_text_list.append({question: answers_text_list})
+                        correct_answers_list.append(answers_text_list)
 
-                        print(question_text_list)
+
 
                     makeup_exam = driver.find_element_by_class_name("from_confirm").find_element_by_tag_name("button")
                     makeup_exam.click()
@@ -169,6 +173,31 @@ def make_after_test(course_name):
                                 makeup_question_text = makeup_question_text + " "
 
                         print("补考题目是： {}".format(makeup_question_text))
+
+                        if makeup_question_text in questions_list:
+                            index = questions_list.index(makeup_question_text)
+                            correct_answer_list = correct_answers_list[index]
+                            makeup_choice_list = makeup_question_item.find_elements_by_tag_name("p")[1:]
+                            for makeup_choice in makeup_choice_list:
+                                span = makeup_choice.find_element_by_tag_name("span")
+                                label = span.find_element_by_tag_name("label")
+                                answer = label.text
+                                if answer in correct_answer_list:
+                                    label.click()
+                                    sleep(0.2)
+
+                                    print("正确答案是：{}".format(answer))
+                        else:
+                            print("该题目 {} 在第一次测试时未出现，没有记录正确答案".format(makeup_question_text))
+                            makeup_choice_list = makeup_question_item.find_elements_by_tag_name("p")[1:]
+                            # 随便选一个B
+                            makeup_choice = makeup_choice_list[1]
+                            span = makeup_choice.find_element_by_tag_name("span")
+                            label = span.find_element_by_tag_name("label")
+                            label.click()
+                            sleep(0.2)
+
+                        '''
                         correct_answer_list = []
                         for i, question_text in enumerate(question_text_list):
                             if makeup_question_text in question_text:
@@ -197,6 +226,7 @@ def make_after_test(course_name):
                             label = span.find_element_by_tag_name("label")
                             label.click()
                             sleep(0.2)
+                        '''
                     from_confirm = driver.find_element_by_class_name("from_confirm")
                     goNext = from_confirm.find_element_by_tag_name("input")
                     goNext.click()
@@ -231,7 +261,7 @@ def end_after_test():
 
 
 if __name__ == "__main__":
-    '''
+
     print("课程学分：" + str(credit_list))
     select_credit = input("请输入要课后测试的课程的学分：")
     if float(select_credit) not in credit_list:
@@ -287,4 +317,5 @@ if __name__ == "__main__":
         print("课程《{}》课后测试未通过".format(course_name))
         fail_num += 1
         fail_list.append(course_name)
-    # driver.quit()
+    '''
+    driver.quit()
