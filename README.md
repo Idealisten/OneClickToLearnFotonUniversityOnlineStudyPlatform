@@ -16,3 +16,7 @@
 * **CourseEvaluationBySelenium.py**&emsp;一键评价<br>
 * **AfterTest.py**&emsp;一键考试（依赖于补考）<br>
 ### 部分功能还不是很完善，发现bug请提issue，有空会更新
+# TODOs
+* 课后测试题库
+* 无GUI版本，挂在服务器上24h学习
+* 发布GUI版本
