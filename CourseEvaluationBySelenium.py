@@ -51,22 +51,21 @@ def load_course():
             line = f.readline()
 
 
-def evaluation():
-
+def do_evaluation():
     span = WebDriverWait(driver, 15, 0.5).until(EC.presence_of_element_located((By.ID, 'star')))
     a_list = span.find_elements_by_tag_name('a')
     a_list[4].click()
     form_choice = WebDriverWait(driver, 15, 0.5).until(EC.presence_of_element_located((By.CLASS_NAME, 'form_choice')))
     question_list = form_choice.find_elements_by_tag_name("div")
-    for question in question_list[:4]:
+    for question in question_list[:-1]:
         p_list = question.find_elements_by_tag_name("p")
-        p6 = p_list[5]
+        p6 = p_list[1]
         input_button = p6.find_element_by_tag_name("input")
         input_button.click()
-    q5 = question_list[4]
+    q5 = question_list[-1]
     textarea = q5.find_element_by_tag_name("textarea")
     textarea.click()
-    textarea.send_keys("666")
+    textarea.send_keys("讲得很好，值得学习")
     submit = driver.find_element_by_id("courseEvaluateSubmit")
     submit.click()
     table = driver.find_element_by_id("button0ButtonPanel")
@@ -74,6 +73,22 @@ def evaluation():
     view = driver.find_element_by_id("courseEvaluateViewBtn")
     view.click()
     sleep(0.5)
+
+
+def evaluation():
+    try:
+        studyProgress = WebDriverWait(driver, 15, 0.5).until(
+            EC.presence_of_element_located((By.ID, "studyProgress"))
+        )
+        score = studyProgress.text
+        if score == "100":
+            # 学完了，可以开始评估
+            courseStudyCourseGoNext = driver.find_element_by_id("courseStudyCourseGoNext")
+            courseStudyCourseGoNext.click()
+            sleep(6)
+            do_evaluation()
+    except:
+        do_evaluation()
 
 
 def end_evalustion():
