@@ -268,21 +268,4 @@ if __name__ == "__main__":
                 fail_list.append(course_name)
         driver.quit()
         end_after_test()
-        '''
-    driver = webdriver.Firefox()
-    open_broswer()
-    judge()
-    course_id = "LTC022403"
-    course_name = "互联网商业模式背后的秘密"
-    after_test_url = template_after_test_url.format(course_id)
-    driver.get(after_test_url)
-    sleep(1)
-    print("正在课后测试《{}》课程".format(course_name))
-    try:
-        make_after_test(course_name)
-    except:
-        print("课程《{}》课后测试未通过".format(course_name))
-        fail_num += 1
-        fail_list.append(course_name)
-    '''
-    driver.quit()
+
