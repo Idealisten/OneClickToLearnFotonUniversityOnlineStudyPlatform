@@ -52,6 +52,7 @@ def load_course():
 
 
 def evaluation():
+
     span = WebDriverWait(driver, 15, 0.5).until(EC.presence_of_element_located((By.ID, 'star')))
     a_list = span.find_elements_by_tag_name('a')
     a_list[4].click()
@@ -100,7 +101,7 @@ if __name__ == "__main__":
             course_name = course_line_list[-4]
             evaluation_url = template_evaluation_url.format(course_id)
             driver.get(evaluation_url)
-            sleep(1)
+            sleep(3)
 
             try:
                 evaluation()

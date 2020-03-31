@@ -65,6 +65,7 @@ def make_after_test(course_name):
         sleep(1)
     except:
         # 点击确定后开始第一次做题
+        sleep(5)
         courseInfoForm = driver.find_element_by_id("courseInfoForm")
         h1 = courseInfoForm.find_element_by_class_name("main_title")
         span = h1.find_element_by_tag_name("span")
@@ -89,10 +90,13 @@ def make_after_test(course_name):
                 from_confirm = driver.find_element_by_class_name("from_confirm")
                 submit_button = from_confirm.find_element_by_id("goNext")
                 submit_button.click()
-                sleep(0.5)
+                sleep(3)
                 print("第一次测试已提交")
                 # 提交后点查看结果
-                message = driver.find_element_by_id("courseExamMsgBody")
+                message = WebDriverWait(driver, 15, 1).until(
+                    EC.presence_of_element_located((By.ID, "courseExamMsgBody"))
+                )
+                # message = driver.find_element_by_id("courseExamMsgBody")
                 pointreson = message.find_element_by_class_name("pointreson")
                 p = pointreson.find_element_by_tag_name("p")
                 score = p.find_elements_by_tag_name("b")[0].text
@@ -101,10 +105,11 @@ def make_after_test(course_name):
                 print(p.text)
                 if float(score) >= 60:
                     # 运气好，一次通过课后测试，点查看结果
+
                     div = message.find_elements_by_tag_name("div")[1]
                     courseExamMsgViewBtn = div.find_element_by_id("courseExamMsgViewBtn")
                     courseExamMsgViewBtn.click()
-                    sleep(1)
+                    sleep(10)
                     success_num += 1
                 else:
                     # 点查看结果，记录答案
@@ -142,7 +147,7 @@ def make_after_test(course_name):
                                 # 没找到标记，这个选项不是正确答案
                                 pass
                             else:
-                                # 找到了，记录正确答案。题目顺序会变，选项顺序会变吗？
+                                # 找到了，记录正确答案
                                 # answer_choice = choice.find_element_by_tag_name("span").find_element_by_tag_name("span").text
                                 answer_text = choice.find_element_by_tag_name("span").find_element_by_tag_name("label").text
                                 answers_text_list.append(answer_text)
@@ -151,14 +156,15 @@ def make_after_test(course_name):
 
                         # question_text_list.append({question: answers_text_list})
                         correct_answers_list.append(answers_text_list)
-
-
-
+                    sleep(10)
                     makeup_exam = driver.find_element_by_class_name("from_confirm").find_element_by_tag_name("button")
                     makeup_exam.click()
-                    sleep(2)
+                    sleep(10)
                     print("开始补考")
-                    courseInfoForm = driver.find_element_by_id("courseInfoForm")
+                    courseInfoForm = WebDriverWait(driver, 15, 1).until(
+                        EC.presence_of_element_located((By.ID, "courseInfoForm"))
+                    )
+                    # courseInfoForm = driver.find_element_by_id("courseInfoForm")
                     form_choice = courseInfoForm.find_element_by_class_name("form_choice")
                     makeup_question_item_list = form_choice.find_elements_by_class_name("question-item")
                     for k, makeup_question_item in enumerate(makeup_question_item_list):
@@ -197,41 +203,14 @@ def make_after_test(course_name):
                             label.click()
                             sleep(0.2)
 
-                        '''
-                        correct_answer_list = []
-                        for i, question_text in enumerate(question_text_list):
-                            if makeup_question_text in question_text:
-                                correct_answer_list = question_text_list[i].get(makeup_question_text)
-                                show = 1
-                            else:
-                                show = 0
-
-                        if show == 1:
-                            makeup_choice_list = makeup_question_item.find_elements_by_tag_name("p")[1:]
-                            for makeup_choice in makeup_choice_list:
-                                span = makeup_choice.find_element_by_tag_name("span")
-                                label = span.find_element_by_tag_name("label")
-                                answer = label.text
-                                if answer in correct_answer_list:
-                                    label.click()
-                                    sleep(0.2)
-
-                                    print("正确答案是：{}".format(answer))
-                        elif show == 0:
-                            print("该题目 {} 在第一次测试时未出现，没有记录正确答案".format(makeup_question_text))
-                            makeup_choice_list = makeup_question_item.find_elements_by_tag_name("p")[1:]
-                            # 随便选一个B
-                            makeup_choice = makeup_choice_list[1]
-                            span = makeup_choice.find_element_by_tag_name("span")
-                            label = span.find_element_by_tag_name("label")
-                            label.click()
-                            sleep(0.2)
-                        '''
                     from_confirm = driver.find_element_by_class_name("from_confirm")
                     goNext = from_confirm.find_element_by_tag_name("input")
                     goNext.click()
-                    sleep(1)
-                    courseExamMsgBody = driver.find_element_by_id("courseExamMsgBody")
+                    sleep(10)
+                    courseExamMsgBody = WebDriverWait(driver, 15, 1).until(
+                        EC.presence_of_element_located((By.ID, "courseExamMsgBody"))
+                    )
+                    # courseExamMsgBody = driver.find_element_by_id("courseExamMsgBody")
                     pointreson = courseExamMsgBody.find_element_by_class_name("pointreson")
                     p = pointreson.find_element_by_tag_name("p")
                     print(course_name)
@@ -287,18 +266,6 @@ if __name__ == "__main__":
                 print("课程《{}》课后测试未通过".format(course_name))
                 fail_num += 1
                 fail_list.append(course_name)
-        course_id = "LTC022403"
-        course_name = "互联网商业模式背后的秘密"
-        after_test_url = template_after_test_url.format(course_id)
-        driver.get(after_test_url)
-        sleep(1)
-        print("正在课后测试《{}》课程".format(course_name))
-        try:
-            make_after_test(course_name)
-        except:
-            print("课程《{}》课后测试未通过".format(course_name))
-            fail_num += 1
-            fail_list.append(course_name)
         driver.quit()
         end_after_test()
         '''
