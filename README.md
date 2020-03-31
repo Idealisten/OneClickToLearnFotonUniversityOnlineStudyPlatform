@@ -15,6 +15,10 @@
 * **StudyByCredit.py**&emsp;一键学习（支持课前测试）<br>
 * **CourseEvaluationBySelenium.py**&emsp;一键评价<br>
 * **AfterTest.py**&emsp;一键考试（依赖于补考）<br>
+### 示例图片
+![一键学习](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E5%AD%A6%E4%B9%A0.JPG)<br>
+![一键选课](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E9%80%89%E8%AF%BE.JPG)<br>
+![挂机学习](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E6%8C%82%E6%9C%BA%E5%AD%A6%E4%B9%A0.JPG)<br>
 ### 部分功能还不是很完善，发现bug请提issue，有空会更新
 # TODOs
 * 课后测试题库
