@@ -111,5 +111,5 @@ if __name__ == "__main__":
             else:
                 print("课程《{}》评估完成".format(course_name))
                 success_num += 1
-
+        driver.quit()
         end_evalustion()
