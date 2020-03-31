@@ -1,4 +1,5 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform)
+![GitHub top language](https://img.shields.io/github/languages/top/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform)
 # 一键学习Bot
 * 本程序仅供交流学习，强烈不建议使用本程序，强烈建议好好学习。<br>
 * 使用者默认接受Apache-2.0开源协议。<br>
