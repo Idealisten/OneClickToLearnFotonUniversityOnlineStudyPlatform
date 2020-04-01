@@ -14,11 +14,12 @@
 ##### 自定义选课学习：
 * **OneClickStudying.py**&emsp;一键秒学<br>
 * **RobotLearner.py**&emsp;一键秒学+挂机学习（针对一些不能秒学的）<br>
+* **OneClickAfterTest.py**&emsp;一键考试（依赖于补考）<br>
 ##### 根据学分批量选课学习：
 * **ChooseCourseByCredit.py**&emsp;一键选课（比如你想选所有0.5学分的课）<br>
 * **StudyByCredit.py**&emsp;一键学习（支持课前测试）<br>
 * **CourseEvaluationBySelenium.py**&emsp;一键评价<br>
-* **AfterTest.py**&emsp;一键考试（依赖于补考）<br>
+* **AfterTest.py**&emsp;一键考试<br>
 ### 示例图片
 ![一键学习](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E5%AD%A6%E4%B9%A0.JPG)<br>
 ![一键选课](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E9%80%89%E8%AF%BE.JPG)<br>
