@@ -106,7 +106,7 @@ def show_time():
     print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
 
 
-def load_course(course_id, ):
+def load_course(course_id):
     """
     加载课程信息，课程名称，视频名称，视频ID
     """
