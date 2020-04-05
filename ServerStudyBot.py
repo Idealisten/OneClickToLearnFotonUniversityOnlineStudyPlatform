@@ -1,5 +1,5 @@
 from selenium import webdriver
-from requests import post
+from requests import post, get
 from time import sleep
 from sys import stdout
 from json import loads
@@ -75,6 +75,13 @@ select_resource_api = "http://study.foton.com.cn/els/html/courseStudyItem/course
 study_check_api_tmp = "http://study.foton.com.cn/els/html/coursestudyrecord/coursestudyrecord.studyCheck.do?courseId={}&scoId={}"
 # 查看小节学习进度
 scols_complate_api_tmp = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.scoIsComplate.do?courseId={}&processType=THREESCREEN"
+# sever酱推送接口
+notification_api_tmp = "https://sc.ftqq.com/{}.send"
+
+
+def push_notification(ntfc):
+    get(notification_api, params={'text': "FotonBot学习进度推送", "desp": ntfc})
+
 
 def show_time():
     print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
@@ -255,39 +262,31 @@ def is_finished():
             span = h1.find_element_by_tag_name('span')
             if span.text == "课程评估":
                 success_num += 1
-
                 print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
-                if success_num % 30 == 0:
-                    info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
-                                                                       len(course_info_list),
-                                                                       round(success_num / len(course_info_list),
-                                                                             2))
-                    msg = MIMEText(info, 'plain', 'utf-8')
-                    server.sendmail(from_addr, [to_addr], msg.as_string())
+                info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
+                                                                   len(course_info_list),
+                                                                   round(success_num / len(course_info_list), 2))
+                push_notification(info)
             elif span.text == "课前测试":
                 pre_test()
             elif span.text == "课后测试":
                 success_num += 1
                 print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
-                if success_num % 30 == 0:
-                    info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
-                                                                       len(course_info_list),
-                                                                       round(success_num / len(course_info_list),
-                                                                             2))
-                    msg = MIMEText(info, 'plain', 'utf-8')
-                    server.sendmail(from_addr, [to_addr], msg.as_string())
+                info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
+                                                                   len(course_info_list),
+                                                                   round(success_num / len(course_info_list),
+                                                                         2))
+                push_notification(info)
 
     else:
         if span.text == '100':
             success_num += 1
             print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
-            if success_num % 30 == 0:
-                info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
-                                                                   len(course_info_list),
-                                                                   round(success_num / len(course_info_list),
-                                                                         2))
-                msg = MIMEText(info, 'plain', 'utf-8')
-                server.sendmail(from_addr, [to_addr], msg.as_string())
+            info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
+                                                               len(course_info_list),
+                                                               round(success_num / len(course_info_list),
+                                                                     2))
+            push_notification(info)
         else:
             # 开始学习
             learn()
@@ -332,13 +331,11 @@ def learn():
                     if r_dict['completed'] == 'true':
                         success_num += 1
                         print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
-                        if success_num % 30 == 0:
-                            info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
-                                                                               len(course_info_list),
-                                                                               round(success_num / len(course_info_list),
-                                                                                     2))
-                            msg = MIMEText(info, 'plain', 'utf-8')
-                            server.sendmail(from_addr, [to_addr], msg.as_string())
+                        info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
+                                                                           len(course_info_list),
+                                                                           round(success_num / len(course_info_list),
+                                                                                 2))
+                        push_notification(info)
             else:
                 fail_num += 1
                 print("课程《{}》学习失败，已学习失败{}门课程".format(course_name, fail_num))
@@ -368,11 +365,9 @@ def learn():
             show_time()
             print("《{}》课程全部视频学习完毕".format(course_name))
             success_num += 1
-            if success_num % 30 == 0:
-                info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num, len(course_info_list),
-                                                                   round(success_num / len(course_info_list), 2))
-                msg = MIMEText(info, 'plain', 'utf-8')
-                server.sendmail(from_addr, [to_addr], msg.as_string())
+            info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num, len(course_info_list),
+                                                               round(success_num / len(course_info_list), 2))
+            push_notification(info)
         else:
             for index, vid in enumerate(vid_list):
                 sleep(1)
@@ -396,11 +391,13 @@ def learn():
                     show_time()
                     success_num += 1
                     print("《{}》课程全部视频学习完毕".format(course_name))
-                    if success_num % 30 == 0:
-                        info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num, len(course_info_list), round(success_num/len(course_info_list), 2))
-                        msg = MIMEText(info, 'plain', 'utf-8')
-                        server.sendmail(from_addr, [to_addr], msg.as_string())
-                        sleep(1)
+                    info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num, len(course_info_list), round(success_num/len(course_info_list), 2))
+                    '''
+                    msg = MIMEText(info, 'plain', 'utf-8')
+                    server.sendmail(from_addr, [to_addr], msg.as_string())
+                    '''
+                    push_notification(info)
+                    sleep(1)
 
 
 def end_study():
@@ -410,8 +407,7 @@ def end_study():
     if fail_num > 0:
         print("学习失败的课程有{}".format(fail_list))
         print("请检查学习失败的课程是否已经完成选课，未进行选课的课程无法学习。")
-    msg = MIMEText(end_info, 'plain', 'utf-8')
-    server.sendmail(from_addr, [to_addr], msg.as_string())
+    push_notification(end_info)
 
 
 if __name__ == "__main__":
@@ -430,6 +426,9 @@ if __name__ == "__main__":
         open_broswer()
         username = input("请输入用户名：")
         password = input("请输入密码：")
+        sckey = input("请输入server酱sckey：")
+        notification_api = notification_api_tmp.format(sckey)
+        '''
         from_addr = input("输入邮箱用户名")
         mail_password = input("输入邮箱密码或授权码")
         # 输入收件人地址:
@@ -439,6 +438,7 @@ if __name__ == "__main__":
         server = smtplib.SMTP(smtp_server, 25)  # SMTP协议默认端口是25
         server.set_debuglevel(1)
         server.login(from_addr, mail_password)
+        '''
         login()
         while not login_ok():
             driver.refresh()
@@ -463,7 +463,6 @@ if __name__ == "__main__":
                 fail_list.append(course_name)
                 print("请检查《{}》是否已选课！".format(course_name))
         driver.quit()
-        server.quit()
         end_study()
 
 
