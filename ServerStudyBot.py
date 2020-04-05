@@ -44,7 +44,9 @@ data_single = {
 data_double = {
     'courseId': ' ',
     'scoId': ' ',
-    'progress_measure': '100'
+    'progress_measure': '100',
+    'session_time': '60:01',
+    'location': '3601'
 }
 
 select_video_data = {
@@ -186,7 +188,7 @@ def video_finished(course_id, video_id):
     else:
         r_data = r.text
 
-        # print(r.text)
+        print(r.text)
 
         if len(r_data) != 0:
 
