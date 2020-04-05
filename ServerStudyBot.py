@@ -167,7 +167,7 @@ def course_finished(completed_list, vid_list):
         return False
 
 
-def video_finished(course_id, video_id):
+def video_finished(course_id, video_id, course_name, video_name):
     """
     判断视频是否播放完毕
     """
@@ -204,8 +204,8 @@ def video_finished(course_id, video_id):
                         return True
                     else:
                         show_time()
-                        print("视频播放进度{}%，课程学习进度{}%".format(
-                            r_dict['completeRate'], r_dict['courseProgress']))
+                        print("{}视频播放进度{}%，{}课程学习进度{}%".format(video_name, r_dict['completeRate'],
+                                                               course_name, r_dict['courseProgress']))
                         return False
                 else:
                     return False
@@ -379,7 +379,7 @@ def learn():
                 print("开始学习 {} 视频".format(video_title))
                 select_video(course_id, vid)
                 while True:
-                    if video_finished(course_id, vid):
+                    if video_finished(course_id, vid, course_name, video_title):
                         show_time()
                         print("{} 视频学习完毕".format(video_title))
                         sleep(1)
