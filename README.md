@@ -18,6 +18,7 @@
 ##### 根据学分批量选课学习：
 * **ChooseCourseByCredit.py**&emsp;一键选课（比如你想选所有0.5学分的课）<br>
 * **StudyByCredit.py**&emsp;一键学习（支持课前测试）<br>
+* **ServerStudyBot.py**&emsp;云端一键学习（支持课前测试，支持推送学习进度到手机————依赖于Server酱）<br>
 * **CourseEvaluationBySelenium.py**&emsp;一键评价<br>
 * **AfterTest.py**&emsp;一键考试<br>
 ### 示例图片
