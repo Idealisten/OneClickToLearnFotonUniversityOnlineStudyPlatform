@@ -25,6 +25,7 @@
 ![一键学习](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E5%AD%A6%E4%B9%A0.JPG)<br>
 ![一键选课](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E9%80%89%E8%AF%BE.JPG)<br>
 ![挂机学习](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E6%8C%82%E6%9C%BA%E5%AD%A6%E4%B9%A0.JPG)<br>
+![云端学习进度推送](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%BA%91%E7%AB%AF%E5%AD%A6%E4%B9%A0%E6%8E%A8%E9%80%81.jpg)<br>
 ### 部分功能还不是很完善，发现bug请提issue，有空会更新
 # TODOs
 * 课后测试题库
