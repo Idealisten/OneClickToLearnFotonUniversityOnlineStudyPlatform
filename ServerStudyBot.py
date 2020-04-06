@@ -22,6 +22,7 @@ fail_list = []
 course_info_list = []
 course_id = ''
 course_name = ''
+course_timeout = 0
 
 header = {
     'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -306,6 +307,7 @@ def get_cookie():
 def learn():
     global success_num
     global fail_num
+    global course_timeout
     play_button = WebDriverWait(driver, 3, 0.5).until(
         EC.presence_of_element_located((By.ID, 'courseRp_sel')))
     play_button.click()
@@ -395,7 +397,7 @@ def learn():
                         t += 1
                         if t > 30:
                             print("{} 视频学习超时".format(video_title))
-                            sleep(1)
+                            course_timeout = 1
                             break
                 completed_video_list = get_completed_video_list(course_id)
                 if course_finished(completed_video_list, vid_list):
@@ -410,6 +412,14 @@ def learn():
                     '''
                     push_notification(info)
                     sleep(1)
+                elif course_timeout == 1:
+                    show_time()
+                    fail_num += 1
+                    fail_list.append(course_name)
+                    course_timeout = 0
+                    print("《{}》课程学习超时".format(course_name))
+                    info = "《{}》课程学习超时".format(course_name)
+                    push_notification(info)
 
 
 def end_study():
