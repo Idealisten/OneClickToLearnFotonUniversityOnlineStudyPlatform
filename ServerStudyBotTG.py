@@ -84,7 +84,7 @@ notification_api_tmp = 'https://api.telegram.org/bot{}/sendMessage?chat_id={}&pa
 
 def push_notification(ntfc):
     try:
-        get(notification_api+ntfc)
+        get(notification_api+"福田大学云学习进度提示：\n"+ntfc)
     except:
         print("推送到TG时出错")
 
