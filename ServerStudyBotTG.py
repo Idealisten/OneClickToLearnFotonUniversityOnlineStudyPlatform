@@ -94,12 +94,13 @@ def show_time():
 
 
 def open_broswer():
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(20)
     driver.get("http://study.foton.com.cn")
 
 
 def login():
     print("登录中...")
+    sleep(10)
     usrname = driver.find_element_by_id('loginName')
     usrname.click()
     usrname.send_keys(username)
@@ -139,9 +140,13 @@ def select_video(course_id, video_id):
     select_video_data['courseId'] = course_id
     select_video_data['scoId'] = video_id
     select_video_data['elsSign'] = cookie['eln_session_id']
-    post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
     study_check_api = study_check_api_tmp.format(course_id, video_id)
-    post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
+    sleep(5)
+    try:
+        post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
+        post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
+    except:
+        pass
 
 
 def get_completed_video_list(course_id):
@@ -221,7 +226,7 @@ def video_finished(course_id, video_id, course_name, video_name):
 
 
 def pre_test():
-    sleep(5)
+    sleep(15)
     form = driver.find_element_by_id("coursePretestForm")
     sleep(5)
     try:
@@ -257,6 +262,7 @@ def pre_test():
 
 def is_finished():
     global success_num
+    sleep(15)
     try:
         # 通过课程进度判断课程是否学习完成，span.text == '100'说明已经学完了
         # span = driver.find_element_by_id("studyProgress")
@@ -316,7 +322,8 @@ def learn():
     global success_num
     global fail_num
     global course_timeout
-    play_button = WebDriverWait(driver, 3, 0.5).until(
+    sleep(15)
+    play_button = WebDriverWait(driver, 15, 0.5).until(
         EC.presence_of_element_located((By.ID, 'courseRp_sel')))
     play_button.click()
     sleep(5)
