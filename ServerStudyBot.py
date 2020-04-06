@@ -275,7 +275,7 @@ def is_finished():
                 print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
                 info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
                                                                    len(course_info_list),
-                                                                   str(round(success_num+fail_num / len(course_info_list),
+                                                                   str(round((success_num+fail_num) / len(course_info_list),
                                                                              4) * 100) + "%")
                 push_notification(info)
             elif span.text == "课前测试":
@@ -285,7 +285,7 @@ def is_finished():
                 print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
                 info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
                                                                    len(course_info_list),
-                                                                   str(round(success_num+fail_num / len(course_info_list),
+                                                                   str(round((success_num+fail_num) / len(course_info_list),
                                                                              4) * 100) + "%")
                 push_notification(info)
 
@@ -295,7 +295,7 @@ def is_finished():
             print("恭喜你！课程《{}》 已经完成学习，已成功学习 {} 门".format(course_name, success_num))
             info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
                                                                len(course_info_list),
-                                                               str(round(success_num+fail_num / len(course_info_list),
+                                                               str(round((success_num+fail_num) / len(course_info_list),
                                                                          4) * 100) + "%")
             push_notification(info)
         else:
@@ -346,7 +346,7 @@ def learn():
                         info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num,
                                                                            len(course_info_list),
                                                                            str(round(
-                                                                               success_num+fail_num / len(course_info_list),
+                                                                               (success_num+fail_num) / len(course_info_list),
                                                                                4) * 100) + "%")
                         push_notification(info)
             else:
@@ -379,7 +379,7 @@ def learn():
             print("《{}》课程全部视频学习完毕".format(course_name))
             success_num += 1
             info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num, len(course_info_list),
-                                                               str(round(success_num+fail_num / len(course_info_list),
+                                                               str(round((success_num+fail_num) / len(course_info_list),
                                                                          4) * 100) + "%")
             push_notification(info)
         else:
@@ -412,7 +412,7 @@ def learn():
                     success_num += 1
                     print("《{}》课程全部视频学习完毕".format(course_name))
                     info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num, len(course_info_list),
-                                                                       str(round(success_num+fail_num / len(course_info_list),
+                                                                       str(round((success_num+fail_num) / len(course_info_list),
                                                                                  4) * 100) + "%")
                     '''
                     msg = MIMEText(info, 'plain', 'utf-8')
@@ -492,8 +492,8 @@ if __name__ == "__main__":
             except:
                 fail_num += 1
                 fail_list.append(course_name)
-                print("请检查《{}》是否已选课！".format(course_name))
-                info = "请检查《{}》是否已选课！".format(course_name)
+                print("{} 学习失败，请检查《{}》是否已选课！".format(course_name, course_name))
+                info = "{} 学习失败, 请检查《{}》是否已选课！".format(course_name, course_name)
                 push_notification(info)
         driver.quit()
         end_study()
