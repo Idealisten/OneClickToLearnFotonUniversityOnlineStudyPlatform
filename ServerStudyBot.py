@@ -24,17 +24,17 @@ course_id = ''
 course_name = ''
 
 header = {
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Connection': 'keep-alive',
-        'Content-Length': '57',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'Host': 'study.foton.com.cn',
-        'Origin': 'http://study.foton.com.cn',
-        'Referer': 'http://study.foton.com.cn/els/flash/elnFlvPlayer.swf?v=4.0.2',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
-        'X-Requested-With': 'XMLHttpRequest'}
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+    'Connection': 'keep-alive',
+    'Content-Length': '57',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    'Host': 'study.foton.com.cn',
+    'Origin': 'http://study.foton.com.cn',
+    'Referer': 'http://study.foton.com.cn/els/flash/elnFlvPlayer.swf?v=4.0.2',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
+    'X-Requested-With': 'XMLHttpRequest'}
 
 data_single = {
     'courseId': 'PTC035903',
@@ -206,6 +206,9 @@ def video_finished(course_id, video_id, course_name, video_name):
                         show_time()
                         print("{}视频播放进度{}%，{}课程学习进度{}%".format(video_name, r_dict['completeRate'],
                                                                course_name, r_dict['courseProgress']))
+                        progress = "{} 视频播放进度{}%，{} 课程学习进度{}%".format(video_name, r_dict['completeRate'],
+                                                                      course_name, r_dict['courseProgress'])
+                        push_notification(progress)
                         return False
                 else:
                     return False
@@ -352,7 +355,7 @@ def learn():
         for div in div_list[1:]:
             try:
                 a = div.find_element_by_tag_name('a')
-            except :
+            except:
                 pass
             else:
                 video_id = a.get_attribute('data-id')
@@ -372,6 +375,7 @@ def learn():
             push_notification(info)
         else:
             for index, vid in enumerate(vid_list):
+                t = 0
                 sleep(1)
                 video_title = title_list[index]
                 data_double['scoId'] = vid
@@ -388,12 +392,18 @@ def learn():
                         post(update_time_api, headers=header, cookies=cookie,
                              data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
                         sleep(180)
+                        t += 1
+                        if t > 30:
+                            print("{} 视频学习超时".format(video_title))
+                            sleep(1)
+                            break
                 completed_video_list = get_completed_video_list(course_id)
                 if course_finished(completed_video_list, vid_list):
                     show_time()
                     success_num += 1
                     print("《{}》课程全部视频学习完毕".format(course_name))
-                    info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num, len(course_info_list), round(success_num/len(course_info_list), 2))
+                    info = "《{}》课程全部视频学习完毕.学习成功{}门.共{}门.学习进度{}".format(course_name, success_num, len(course_info_list),
+                                                                       round(success_num / len(course_info_list), 2))
                     '''
                     msg = MIMEText(info, 'plain', 'utf-8')
                     server.sendmail(from_addr, [to_addr], msg.as_string())
@@ -466,5 +476,3 @@ if __name__ == "__main__":
                 print("请检查《{}》是否已选课！".format(course_name))
         driver.quit()
         end_study()
-
-
