@@ -104,7 +104,6 @@ class SelectCourseThread(QThread):
         self.signal.emit(msg + '\n')
 
 
-
 class StudyCousre(QThread):
     signal = pyqtSignal(str)
 
