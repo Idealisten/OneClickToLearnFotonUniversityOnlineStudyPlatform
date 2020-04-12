@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'study.ui'
-#
-# Created by: PyQt5 UI code generator 5.14.1
-#
-# WARNING! All changes made in this file will be lost!
-
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread, pyqtSignal
 import sys
@@ -87,7 +78,7 @@ class OpenBroswerThread(QThread):
 
 
 class SelectCourseThread(QThread):
-    signal = pyqtSignal()
+    signal = pyqtSignal(str)
 
     def __init__(self):
         super(SelectCourseThread, self).__init__()
@@ -294,6 +285,8 @@ class StudyCousre(QThread):
                     sleep(1)
                 self.clear_list()
             sleep(1)
+        course_id_list.clear()
+        course_url_list.clear()
 
 
 class Ui_MainWindow(object):
