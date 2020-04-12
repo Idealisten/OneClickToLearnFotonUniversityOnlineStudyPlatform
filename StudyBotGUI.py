@@ -108,7 +108,7 @@ class StudyCousre(QThread):
 
     def show_time(self):
         cur_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-        self.signal.emit(cur_time + '\n')
+        self.signal.emit(cur_time)
         # print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
 
     def load_course(self, course_id):
@@ -364,6 +364,7 @@ class Ui_MainWindow(object):
         self.pushButton.clicked.connect(self.open_broswer)
         self.pushButton_2.clicked.connect(self.select_course)
         self.pushButton_3.clicked.connect(self.study_course)
+        self.cursor = self.textBrowser.textCursor()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -378,7 +379,9 @@ class Ui_MainWindow(object):
         self.thread.start()
 
     def set_text_broswer(self, text):
-        self.textBrowser.setText(text)
+        # self.textBrowser.setText(text)
+        self.textBrowser.append(text)
+        self.textBrowser.moveCursor(self.cursor.End)
 
     def select_course(self):
         self.thread2 = SelectCourseThread()
