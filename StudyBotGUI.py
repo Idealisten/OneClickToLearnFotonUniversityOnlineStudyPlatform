@@ -436,7 +436,7 @@ class Ui_MainWindow(object):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(argv)
-    app.setWindowIcon(QIcon(r"Images\foton.ico"))
+    app.setWindowIcon(QIcon(r"Images/foton.jpg"))
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
