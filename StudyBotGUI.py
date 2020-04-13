@@ -79,7 +79,7 @@ class OpenBroswerThread(QThread):
     def run(self):
         self.signal.emit("正在打开登录页面，请登录后进入课程视频播放页面，回到程序选课\n")
         global driver
-        driver = webdriver.Firefox('./geckodriver.exe')
+        driver = webdriver.Firefox(executable_path="./geckodriver.exe")
         # print("正在打开登录页面，请登录后进入课程视频播放页面，然后回到程序继续执行")
         driver.get("http://study.foton.com.cn")
         driver.maximize_window()
