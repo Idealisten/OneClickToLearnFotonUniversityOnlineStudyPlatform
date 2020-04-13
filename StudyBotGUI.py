@@ -1,7 +1,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QThread, pyqtSignal
 import sys
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from requests import post
 from time import sleep
@@ -21,6 +23,8 @@ select_resource_api = "http://study.foton.com.cn/els/html/courseStudyItem/course
 study_check_api_tmp = "http://study.foton.com.cn/els/html/coursestudyrecord/coursestudyrecord.studyCheck.do?courseId={}&scoId={}"
 # 查看小节学习进度
 scols_complate_api_tmp = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.scoIsComplate.do?courseId={}&processType=THREESCREEN"
+# 单分屏获取播放进度api
+one_screen_save_progress_api = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveCoursePrecent.do"
 
 course_id_list = []
 cookie = {}
@@ -44,7 +48,6 @@ header = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36',
     'X-Requested-With': 'XMLHttpRequest'}
 
-
 data = {
         'courseId': '',
         'scoId': '',
@@ -52,6 +55,11 @@ data = {
         'session_time': '60:01',
         'location': '3601'
     }
+
+data_single = {
+    'courseId': '',
+    'playTime': '9999'
+}
 
 select_video_data = {
     'courseId': '',
@@ -69,7 +77,7 @@ class OpenBroswerThread(QThread):
         super(OpenBroswerThread, self).__init__()
 
     def run(self):
-        self.signal.emit("正在打开登录页面，请登录后进入课程视频播放页面，然后回到程序继续执行\n")
+        self.signal.emit("正在打开登录页面，请登录后进入课程视频播放页面，回到程序选课\n")
         global driver
         driver = webdriver.Firefox()
         # print("正在打开登录页面，请登录后进入课程视频播放页面，然后回到程序继续执行")
@@ -125,35 +133,40 @@ class StudyCousre(QThread):
             self.signal.emit("加载视频信息出错\n")
             # print("加载视频信息出错")
         else:
-            course_info_orign = loads(loaded.text)
-            course_name = course_info_orign[0]['text']
-            self.show_time()
-            self.signal.emit("课程名称是:《{}》，开始学习\n".format(course_name))
-            # print("课程名称是:《{}》，开始学习 ".format(course_name))
-            # 一部分在[0]['children']['0']['children']，另一部分课程在['0']['children']下
+            if len(loaded.text) != 0:
+                try:
+                    course_info_orign = loads(loaded.text)
+                except:
+                    pass
+                else:
+                    course_name = course_info_orign[0]['text']
+                    self.show_time()
+                    self.signal.emit("课程名称是:《{}》，开始学习\n".format(course_name))
+                    # print("课程名称是:《{}》，开始学习 ".format(course_name))
+                    # 一部分在[0]['children']['0']['children']，另一部分课程在['0']['children']下
 
-            # print(course_info_orign[0]['children'][0]['children'])
-            # print(course_info_orign[0]['children'])
+                    # print(course_info_orign[0]['children'][0]['children'])
+                    # print(course_info_orign[0]['children'])
 
-            if len(course_info_orign[0]['children'][0]['children']) == 1:
-                course_info_list = course_info_orign[0]['children']
-                c = True
-            else:
-                course_info_list = course_info_orign[0]['children'][0]['children']
-                c = False
-            # print(course_info_list)
+                    if len(course_info_orign[0]['children'][0]['children']) == 1:
+                        course_info_list = course_info_orign[0]['children']
+                        c = True
+                    else:
+                        course_info_list = course_info_orign[0]['children'][0]['children']
+                        c = False
+                    # print(course_info_list)
 
-            if not c:
-                for course_info in course_info_list:
-                    # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
-                    video_id_list.append(course_info['id'])
-                    video_name_list.append(course_info['text'])
-            else:
-                for course_info in course_info_list:
-                    video_id_list.append(course_info['children'][0]['id'])
-                    video_name_list.append(course_info['children'][0]['text'])
-            # print(video_id_list)
-            # print(video_name_list)
+                    if not c:
+                        for course_info in course_info_list:
+                            # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
+                            video_id_list.append(course_info['id'])
+                            video_name_list.append(course_info['text'])
+                    else:
+                        for course_info in course_info_list:
+                            video_id_list.append(course_info['children'][0]['id'])
+                            video_name_list.append(course_info['children'][0]['text'])
+                    # print(video_id_list)
+                    # print(video_name_list)
 
     def get_completed_video_list(self, course_id):
         """
@@ -180,19 +193,35 @@ class StudyCousre(QThread):
         post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']},
              timeout=(15, 15))
 
-    def course_finished(self):
+    def course_finished(self, course_id):
         """
         判断课程是否学习完毕
         """
-        if len(completed_list) == len(course_info_list):
-            return True
+        data_single['courseId'] = course_id
+        try:
+            sr = post(one_screen_save_progress_api, headers=header, cookies=cookie, data=data_single, timeout=(15, 15))
+        except:
+            if len(completed_list) == len(course_info_list):
+                return True
+            else:
+                return False
         else:
-            return False
+            sr_data = sr.text
+            if len(sr_data) != 0:
+                try:
+                    sr_dict = loads(sr_data)
+                except:
+                    print("HTTP Status 500  服务器内部错误")
+                else:
+                    if 'courseProgress' in sr_dict:
+                        if sr_dict['courseProgress'] == '100':
+                            return True
 
-    def video_finished(self, course_id, video_id):
+    def video_finished(self, course_id, video_id, video_name):
         """
         判断视频是否播放完毕
         """
+        global course_name
         data['courseId'] = course_id
         data['scoId'] = video_id
         self.get_completed_video_list(course_id)
@@ -224,8 +253,8 @@ class StudyCousre(QThread):
                             return True
                         else:
                             self.show_time()
-                            self.signal.emit("视频播放进度{}%，课程学习进度{}%\n".format(
-                                r_dict['completeRate'], r_dict['courseProgress']))
+                            self.signal.emit("{} 视频播放进度{}%，《{}》课程学习进度{}%\n".format(video_name,
+                                r_dict['completeRate'], course_name, r_dict['courseProgress']))
                             # print("视频播放进度{}%，课程学习进度{}%".format(r_dict['completeRate'], r_dict['courseProgress']))
                             return False
                     else:
@@ -246,14 +275,24 @@ class StudyCousre(QThread):
         print(course_info_list)
 
     def run(self):
+        global course_name
         for i, course_url in enumerate(course_url_list):
+            self.show_time()
+            self.signal.emit("开始学习第{}门课\n".format(i+1))
             driver.get(course_url)
             course_id = course_id_list[i]
             # print(course_id)
+            try:
+                div = WebDriverWait(driver, 20, 0.5).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, 'barleft')))
+            except:
+                pass
+            else:
+                course_name = div.text.strip("网络设置")
             self.get_cookie()
             self.load_course(course_id)
             self.get_completed_video_list(course_id)
-            if self.course_finished():
+            if self.course_finished(course_id):
                 self.show_time()
                 self.signal.emit("《{}》课程全部视频学习完毕\n".format(course_name))
                 # print("《{}》课程全部视频学习完毕".format(course_name))
@@ -267,7 +306,7 @@ class StudyCousre(QThread):
                     # print("开始学习 {} 视频".format(video_name))
                     self.select_video(course_id, video_id)
                     while True:
-                        if self.video_finished(course_id, video_id):
+                        if self.video_finished(course_id, video_id, video_name):
                             self.show_time()
                             self.signal.emit("{} 视频学习完毕\n".format(video_name))
                             # print("{} 视频学习完毕".format(video_name))
@@ -277,7 +316,7 @@ class StudyCousre(QThread):
                                  data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
                             sleep(180)
                     self.get_completed_video_list(course_id)
-                    if self.course_finished():
+                    if self.course_finished(course_id):
                         self.show_time()
                         self.signal.emit("《{}》课程全部视频学习完毕\n".format(course_name))
                         # print("《{}》课程全部视频学习完毕".format(course_name))
