@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QThread, pyqtSignal, QCoreApplication, QRect, QMetaObject
-from PyQt5.QtGui import QFont,QIcon
+from PyQt5.QtGui import QFont, QIcon
 from sys import argv, exit
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
