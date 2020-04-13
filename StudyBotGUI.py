@@ -1,15 +1,15 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QThread, pyqtSignal
-import sys
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import QThread, pyqtSignal, QCoreApplication, QRect, QMetaObject
+from PyQt5.QtGui import QFont,QIcon
+from sys import argv, exit
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from requests import post
-from time import sleep
+from time import sleep, strftime, localtime, time
 from json import loads
 from re import findall
-import time
 
 # 保存视频播放进度
 save_progress_api = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveProgress.do"
@@ -115,7 +115,7 @@ class StudyCousre(QThread):
             cookie[single_cookie['name']] = single_cookie['value']
 
     def show_time(self):
-        cur_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        cur_time = strftime('%Y-%m-%d %H:%M:%S', localtime(time()))
         self.signal.emit(cur_time)
         # print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
 
@@ -211,7 +211,8 @@ class StudyCousre(QThread):
                 try:
                     sr_dict = loads(sr_data)
                 except:
-                    print("HTTP Status 500  服务器内部错误")
+                    # print("HTTP Status 500  服务器内部错误")
+                    pass
                 else:
                     if 'courseProgress' in sr_dict:
                         if sr_dict['courseProgress'] == '100':
@@ -348,7 +349,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
         self.pushButton.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
+        font = QFont()
         font.setFamily("Microsoft YaHei")
         font.setPointSize(20)
         self.pushButton.setFont(font)
@@ -360,7 +361,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_2.sizePolicy().hasHeightForWidth())
         self.pushButton_2.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
+        font = QFont()
         font.setFamily("Microsoft YaHei")
         font.setPointSize(20)
         self.pushButton_2.setFont(font)
@@ -372,7 +373,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_3.sizePolicy().hasHeightForWidth())
         self.pushButton_3.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
+        font = QFont()
         font.setFamily("Microsoft YaHei")
         font.setPointSize(20)
         self.pushButton_3.setFont(font)
@@ -390,7 +391,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 788, 18))
+        self.menubar.setGeometry(QRect(0, 0, 788, 18))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -398,7 +399,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        QMetaObject.connectSlotsByName(MainWindow)
 
         self.pushButton.clicked.connect(self.open_broswer)
         self.pushButton_2.clicked.connect(self.select_course)
@@ -406,7 +407,7 @@ class Ui_MainWindow(object):
         self.cursor = self.textBrowser.textCursor()
 
     def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
+        _translate = QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "一键学习"))
         self.pushButton.setText(_translate("MainWindow", "开始学习"))
         self.pushButton_2.setText(_translate("MainWindow", "选这门课"))
@@ -434,10 +435,10 @@ class Ui_MainWindow(object):
 
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon(r"Images\foton.jpg"))
+    app = QtWidgets.QApplication(argv)
+    app.setWindowIcon(QIcon(r"Images\foton.jpg"))
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    sys.exit(app.exec_())
+    exit(app.exec_())
