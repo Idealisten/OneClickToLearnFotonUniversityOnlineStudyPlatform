@@ -22,6 +22,8 @@ select_resource_api = "http://study.foton.com.cn/els/html/courseStudyItem/course
 study_check_api_tmp = "http://study.foton.com.cn/els/html/coursestudyrecord/coursestudyrecord.studyCheck.do?courseId={}&scoId={}"
 # 查看小节学习进度
 scols_complate_api_tmp = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.scoIsComplate.do?courseId={}&processType=THREESCREEN"
+# 单分屏获取播放进度api
+one_screen_save_progress_api = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveCoursePrecent.do"
 
 course_id_list = []
 cookie = {}
@@ -53,6 +55,11 @@ data = {
         'session_time': '60:01',
         'location': '3601'
     }
+
+data_single = {
+    'courseId': '',
+    'playTime': '9999'
+}
 
 select_video_data = {
     'courseId': '',
@@ -119,36 +126,41 @@ def load_course(course_id):
     except:
         print("加载视频信息出错")
     else:
-        course_info_orign = loads(loaded.text)
-        course_name = course_info_orign[0]['text']
-        show_time()
-        print("课程名称是:《{}》，开始学习 ".format(course_name))
-        # 一部分在[0]['children']['0']['children']，另一部分课程在['0']['children']下
+        if len(loaded.text) != 0:
+            try:
+                course_info_orign = loads(loaded.text)
+            except:
+                pass
+            else:
+                course_name = course_info_orign[0]['text']
+                show_time()
+                print("课程名称是:《{}》，开始学习 ".format(course_name))
+                # 一部分在[0]['children']['0']['children']，另一部分课程在['0']['children']下
 
-        # print(course_info_orign[0]['children'][0]['children'])
-        # print(course_info_orign[0]['children'])
+                # print(course_info_orign[0]['children'][0]['children'])
+                # print(course_info_orign[0]['children'])
 
-        if len(course_info_orign[0]['children'][0]['children']) == 1:
-            course_info_list = course_info_orign[0]['children']
-            c = True
-        else:
-            course_info_list = course_info_orign[0]['children'][0]['children']
-            c = False
+                if len(course_info_orign[0]['children'][0]['children']) == 1:
+                    course_info_list = course_info_orign[0]['children']
+                    c = True
+                else:
+                    course_info_list = course_info_orign[0]['children'][0]['children']
+                    c = False
 
-        # print(course_info_list)
+                # print(course_info_list)
 
-        if not c:
-            for course_info in course_info_list:
-                # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
-                video_id_list.append(course_info['id'])
-                video_name_list.append(course_info['text'])
-        else:
-            for course_info in course_info_list:
-                video_id_list.append(course_info['children'][0]['id'])
-                video_name_list.append(course_info['children'][0]['text'])
+                if not c:
+                    for course_info in course_info_list:
+                        # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
+                        video_id_list.append(course_info['id'])
+                        video_name_list.append(course_info['text'])
+                else:
+                    for course_info in course_info_list:
+                        video_id_list.append(course_info['children'][0]['id'])
+                        video_name_list.append(course_info['children'][0]['text'])
 
-        # print(video_id_list)
-        # print(video_name_list)
+                # print(video_id_list)
+                # print(video_name_list)
 
 
 def get_completed_video_list(course_id):
@@ -176,14 +188,29 @@ def select_video(course_id, video_id):
     post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
 
 
-def course_finished():
+def course_finished(course_id):
     """
     判断课程是否学习完毕
     """
-    if len(completed_list) == len(course_info_list):
-        return True
+    data_single['courseId'] = course_id
+    try:
+        sr = post(one_screen_save_progress_api, headers=header, cookies=cookie, data=data_single, timeout=(15, 15))
+    except:
+        if len(completed_list) == len(course_info_list):
+            return True
+        else:
+            return False
     else:
-        return False
+        sr_data = sr.text
+        if len(sr_data) != 0:
+            try:
+                sr_dict = loads(sr_data)
+            except:
+                print("HTTP Status 500  服务器内部错误")
+            else:
+                if 'courseProgress' in sr_dict:
+                    if sr_dict['courseProgress'] == '100':
+                        return True
 
 
 def video_finished(course_id, video_id):
@@ -247,15 +274,23 @@ def print_list():
 
 
 def study():
+    global course_name
     select_course()
     for i, course_url in enumerate(course_url_list):
         driver.get(course_url)
         course_id = course_id_list[i]
         # print(course_id)
+        try:
+            div = WebDriverWait(driver, 20, 0.5).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'barleft')))
+        except:
+            pass
+        else:
+            course_name = div.text.strip("网络设置")
         get_cookie()
         load_course(course_id)
         get_completed_video_list(course_id)
-        if course_finished():
+        if course_finished(course_id):
             show_time()
             print("《{}》课程全部视频学习完毕".format(course_name))
             clear_list()
@@ -276,7 +311,7 @@ def study():
                              data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
                         sleep(180)
                 get_completed_video_list(course_id)
-                if course_finished():
+                if course_finished(course_id):
                     show_time()
                     print("《{}》课程全部视频学习完毕".format(course_name))
                     clear_list()
