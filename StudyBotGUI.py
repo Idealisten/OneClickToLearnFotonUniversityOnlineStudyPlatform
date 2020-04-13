@@ -79,7 +79,7 @@ class OpenBroswerThread(QThread):
     def run(self):
         self.signal.emit("正在打开登录页面，请登录后进入课程视频播放页面，回到程序选课\n")
         global driver
-        driver = webdriver.Firefox()
+        driver = webdriver.Firefox('./geckodriver.exe')
         # print("正在打开登录页面，请登录后进入课程视频播放页面，然后回到程序继续执行")
         driver.get("http://study.foton.com.cn")
         driver.maximize_window()
@@ -436,7 +436,7 @@ class Ui_MainWindow(object):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(argv)
-    app.setWindowIcon(QIcon(r"Images\foton.jpg"))
+    app.setWindowIcon(QIcon(r"Images\foton.ico"))
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
