@@ -33,6 +33,7 @@ video_id_list = []
 video_name_list = []
 course_url_list = []
 course_name = ''
+ONESCREEN = -1
 
 header = {
     'Accept': '*/*',
@@ -167,16 +168,17 @@ def get_completed_video_list(course_id):
     """
     获取已经完成的视频列表
     """
-    global completed_list
-    scols_complate_api = scols_complate_api_tmp.format(course_id)
-    try:
-        c = post(scols_complate_api, headers=header, cookies=cookie,
-                 data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
-    except:
-        print("获取视频完成列表出错")
-    else:
-        if len(c.text) != 0:
-            completed_list = loads(c.text)
+    if ONESCREEN != 1:
+        global completed_list
+        scols_complate_api = scols_complate_api_tmp.format(course_id)
+        try:
+            c = post(scols_complate_api, headers=header, cookies=cookie,
+                     data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
+        except:
+            print("获取视频完成列表出错")
+        else:
+            if len(c.text) != 0:
+                completed_list = loads(c.text)
 
 
 def select_video(course_id, video_id):
@@ -192,25 +194,35 @@ def course_finished(course_id):
     """
     判断课程是否学习完毕
     """
-    data_single['courseId'] = course_id
-    try:
-        sr = post(one_screen_save_progress_api, headers=header, cookies=cookie, data=data_single, timeout=(15, 15))
-    except:
+    global ONESCREEN
+    if ONESCREEN != 1:
+
         if len(completed_list) == len(course_info_list):
             return True
         else:
             return False
     else:
-        sr_data = sr.text
-        if len(sr_data) != 0:
-            try:
-                sr_dict = loads(sr_data)
-            except:
-                print("HTTP Status 500  服务器内部错误")
-            else:
-                if 'courseProgress' in sr_dict:
-                    if sr_dict['courseProgress'] == '100':
-                        return True
+        data_single['courseId'] = course_id
+        try:
+            sr = post(one_screen_save_progress_api, headers=header, cookies=cookie, data=data_single, timeout=(15, 15))
+        except:
+            print("获取进度失败")
+        else:
+            sr_data = sr.text
+            if len(sr_data) != 0:
+                try:
+                    sr_dict = loads(sr_data)
+                except:
+                    # print("HTTP Status 500  服务器内部错误")
+                    pass
+                else:
+                    if 'courseProgress' in sr_dict:
+                        if sr_dict['courseProgress'] == '100':
+                            return True
+                        else:
+                            return False
+                    else:
+                        return False
 
 
 def video_finished(course_id, video_id):
@@ -274,19 +286,27 @@ def print_list():
 
 
 def study():
-    global course_name
+    global course_name, ONESCREEN
     select_course()
     for i, course_url in enumerate(course_url_list):
         driver.get(course_url)
         course_id = course_id_list[i]
         # print(course_id)
         try:
-            div = WebDriverWait(driver, 20, 0.5).until(
-                EC.presence_of_element_located((By.CLASS_NAME, 'barleft')))
+            # ele存在说明是双分屏或者三分屏
+            # ele = driver.find_element_by_id('vodtree')
+            ele = WebDriverWait(driver, 5, 0.5).until(
+                EC.presence_of_element_located((By.ID, 'vodtree')))
         except:
-            pass
+            ONESCREEN = 1
         else:
+            ONESCREEN = 0
+        div = WebDriverWait(driver, 5, 0.5).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'barleft')))
+        if ONESCREEN == 1:
             course_name = div.text.strip("网络设置")
+        else:
+            course_name = div.text
         get_cookie()
         load_course(course_id)
         get_completed_video_list(course_id)
