@@ -173,17 +173,18 @@ class StudyCousre(QThread):
         """
         获取已经完成的视频列表
         """
-        global completed_list
-        scols_complate_api = scols_complate_api_tmp.format(course_id)
-        try:
-            c = post(scols_complate_api, headers=header, cookies=cookie,
-                     data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
-        except:
-            self.signal.emit("获取视频完成列表出错\n")
-            # print("获取视频完成列表出错")
-        else:
-            if len(c.text) != 0:
-                completed_list = loads(c.text)
+        if ONESCREEN != 1:
+            global completed_list
+            scols_complate_api = scols_complate_api_tmp.format(course_id)
+            try:
+                c = post(scols_complate_api, headers=header, cookies=cookie,
+                         data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
+            except:
+                self.signal.emit("获取视频完成列表出错\n")
+                # print("获取视频完成列表出错")
+            else:
+                if len(c.text) != 0:
+                    completed_list = loads(c.text)
 
     def select_video(self, course_id, video_id):
         select_video_data['courseId'] = course_id
@@ -200,6 +201,7 @@ class StudyCousre(QThread):
         """
         global ONESCREEN
         if ONESCREEN != 1:
+
             if len(completed_list) == len(course_info_list):
                 return True
             else:
