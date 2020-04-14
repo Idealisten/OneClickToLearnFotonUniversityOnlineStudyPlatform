@@ -34,6 +34,7 @@ video_id_list = []
 video_name_list = []
 course_url_list = []
 course_name = ''
+ONESCREEN = -1
 
 header = {
     'Accept': '*/*',
@@ -197,26 +198,30 @@ class StudyCousre(QThread):
         """
         判断课程是否学习完毕
         """
-        data_single['courseId'] = course_id
-        try:
-            sr = post(one_screen_save_progress_api, headers=header, cookies=cookie, data=data_single, timeout=(15, 15))
-        except:
+        global ONESCREEN
+        if ONESCREEN != 1:
             if len(completed_list) == len(course_info_list):
                 return True
             else:
                 return False
         else:
-            sr_data = sr.text
-            if len(sr_data) != 0:
-                try:
-                    sr_dict = loads(sr_data)
-                except:
-                    # print("HTTP Status 500  服务器内部错误")
-                    pass
-                else:
-                    if 'courseProgress' in sr_dict:
-                        if sr_dict['courseProgress'] == '100':
-                            return True
+            data_single['courseId'] = course_id
+            try:
+                sr = post(one_screen_save_progress_api, headers=header, cookies=cookie, data=data_single, timeout=(15, 15))
+            except:
+                self.signal.emit("获取进度失败")
+            else:
+                sr_data = sr.text
+                if len(sr_data) != 0:
+                    try:
+                        sr_dict = loads(sr_data)
+                    except:
+                        # print("HTTP Status 500  服务器内部错误")
+                        pass
+                    else:
+                        if 'courseProgress' in sr_dict:
+                            if sr_dict['courseProgress'] == '100':
+                                return True
 
     def video_finished(self, course_id, video_id, video_name):
         """
@@ -276,7 +281,7 @@ class StudyCousre(QThread):
         print(course_info_list)
 
     def run(self):
-        global course_name
+        global course_name, ONESCREEN
         for i, course_url in enumerate(course_url_list):
             self.show_time()
             self.signal.emit("开始学习第{}门课\n".format(i+1))
@@ -284,12 +289,20 @@ class StudyCousre(QThread):
             course_id = course_id_list[i]
             # print(course_id)
             try:
-                div = WebDriverWait(driver, 20, 0.5).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, 'barleft')))
+                # ele存在说明是双分屏或者三分屏
+                # ele = driver.find_element_by_id('vodtree')
+                ele = WebDriverWait(driver, 5, 0.5).until(
+                    EC.presence_of_element_located((By.ID, 'vodtree')))
             except:
-                pass
+                ONESCREEN = 0
             else:
+                ONESCREEN = 1
+            div = WebDriverWait(driver, 5, 0.5).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'barleft')))
+            if ONESCREEN == 1:
                 course_name = div.text.strip("网络设置")
+            else:
+                course_name = div.text
             self.get_cookie()
             self.load_course(course_id)
             self.get_completed_video_list(course_id)
@@ -325,6 +338,7 @@ class StudyCousre(QThread):
                     sleep(1)
                 self.clear_list()
             sleep(1)
+            ONESCREEN = -1
         course_id_list.clear()
         course_url_list.clear()
 
