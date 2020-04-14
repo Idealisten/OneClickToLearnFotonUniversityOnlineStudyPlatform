@@ -12,7 +12,7 @@
 * Firefox浏览器 版本 ≥ 60<br>
 2. 功能说明：<br>
 ##### 自定义选课学习：
-* **StudyBotGUI.exe**&emsp;图形界面学习,exe须和geckodriver位于同级目录<br>
+* **StudyBotGUI.exe**&emsp;图形界面学习,exe须和geckodriver位于同级目录，一次可循环添加多门课程<br>
 * **OneClickStudying.py**&emsp;一键秒学<br>
 * **RobotLearner.py**&emsp;一键秒学+挂机学习（针对一些不能秒学的）<br>
 * **OneClickAfterTest.py**&emsp;一键考试（依赖于补考）<br>
