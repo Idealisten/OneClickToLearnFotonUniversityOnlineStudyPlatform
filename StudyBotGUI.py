@@ -224,6 +224,10 @@ class StudyCousre(QThread):
                         if 'courseProgress' in sr_dict:
                             if sr_dict['courseProgress'] == '100':
                                 return True
+                            else:
+                                return False
+                        else:
+                            return False
 
     def video_finished(self, course_id, video_id, video_name):
         """
@@ -296,9 +300,9 @@ class StudyCousre(QThread):
                 ele = WebDriverWait(driver, 5, 0.5).until(
                     EC.presence_of_element_located((By.ID, 'vodtree')))
             except:
-                ONESCREEN = 0
-            else:
                 ONESCREEN = 1
+            else:
+                ONESCREEN = 0
             div = WebDriverWait(driver, 5, 0.5).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'barleft')))
             if ONESCREEN == 1:
