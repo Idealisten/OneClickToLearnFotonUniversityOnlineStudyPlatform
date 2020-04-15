@@ -184,12 +184,14 @@ def get_completed_video_list(course_id):
 
 
 def select_video(course_id, video_id):
-    select_video_data['courseId'] = course_id
-    select_video_data['scoId'] = video_id
-    select_video_data['elsSign'] = cookie['eln_session_id']
-    post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
-    study_check_api = study_check_api_tmp.format(course_id, video_id)
-    post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
+    global ONESCREEN
+    if ONESCREEN != 1:
+        select_video_data['courseId'] = course_id
+        select_video_data['scoId'] = video_id
+        select_video_data['elsSign'] = cookie['eln_session_id']
+        post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
+        study_check_api = study_check_api_tmp.format(course_id, video_id)
+        post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
 
 
 def course_finished(course_id):
@@ -338,6 +340,7 @@ def study():
                     print("《{}》课程全部视频学习完毕".format(course_name))
                     clear_list()
                 sleep(1)
+                ONESCREEN = -1
             clear_list()
         sleep(1)
 
