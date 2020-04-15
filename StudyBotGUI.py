@@ -153,7 +153,9 @@ class StudyCousre(QThread):
                         course_info_list = course_info_orign[0]['children']
                         c = True
                     else:
-                        course_info_list = course_info_orign[0]['children'][0]['children']
+                        for chapter in course_info_orign[0]['children']:
+                            # course_info_list = course_info_orign[0]['children'][0]['children']
+                            course_info_list += chapter['children']
                         c = False
                     # print(course_info_list)
 
@@ -187,13 +189,15 @@ class StudyCousre(QThread):
                     completed_list = loads(c.text)
 
     def select_video(self, course_id, video_id):
-        select_video_data['courseId'] = course_id
-        select_video_data['scoId'] = video_id
-        select_video_data['elsSign'] = cookie['eln_session_id']
-        post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
-        study_check_api = study_check_api_tmp.format(course_id, video_id)
-        post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']},
-             timeout=(15, 15))
+        global ONESCREEN
+        if ONESCREEN != 1:
+            select_video_data['courseId'] = course_id
+            select_video_data['scoId'] = video_id
+            select_video_data['elsSign'] = cookie['eln_session_id']
+            post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
+            study_check_api = study_check_api_tmp.format(course_id, video_id)
+            post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']},
+                 timeout=(15, 15))
 
     def course_finished(self, course_id):
         """
