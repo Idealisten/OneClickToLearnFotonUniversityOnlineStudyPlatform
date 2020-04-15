@@ -145,7 +145,9 @@ def load_course(course_id):
                     course_info_list = course_info_orign[0]['children']
                     c = True
                 else:
-                    course_info_list = course_info_orign[0]['children'][0]['children']
+                    for chapter in course_info_orign[0]['children']:
+                        # course_info_list = course_info_orign[0]['children'][0]['children']
+                        course_info_list += chapter['children']
                     c = False
 
                 # print(course_info_list)
