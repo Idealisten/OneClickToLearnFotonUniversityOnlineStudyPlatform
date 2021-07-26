@@ -10,11 +10,11 @@
 * 下载geckodriver驱动程序，64位Windows操作系统请[点此](https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-win64.zip)下载
 * 下载[使用说明](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/raw/master/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.docx)
 ## 进阶使用说明<br>
-1.  环境配置：<br>
+### 1.  环境配置：<br>
 * Python3.7（安装selenium和requests库）<br>
 * geckodriver.exe添加到环境变量<br>
 * Firefox浏览器 版本 ≥ 60<br>
-2. 功能说明：<br>
+### 2. 功能说明：<br>
 ##### 自定义选课学习：
 * **StudyBotGUI.exe**&emsp;图形界面学习,exe须和geckodriver位于同级目录，一次可循环添加多门课程<br>
 * **OneClickStudying.py**&emsp;一键秒学<br>
