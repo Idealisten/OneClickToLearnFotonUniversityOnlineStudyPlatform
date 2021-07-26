@@ -6,7 +6,7 @@
 * 如果你喜欢本程序，不妨点个star支持一下。<br>
 ## 小白使用说明<br>
 * 下载[刷课程序](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/releases/download/0.31/StudyBotGUI.exe)
-* 安装Firefox浏览器
+* 安装[Firefox浏览器](https://cdn.stubdownloader.services.mozilla.com/builds/firefox-stub/zh-CN/win/0244b03ff75452eec43ebfcabbe3fa2feda8105e3c426bd77b3d801cf01c05c7/Firefox%20Installer.exe)
 * 下载geckodriver驱动程序，64位Windows操作系统请[点此](https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-win64.zip)下载
 * 下载[使用说明](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/raw/master/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.docx)
 ## 进阶使用说明<br>
