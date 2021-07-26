@@ -5,9 +5,9 @@
 * 本程序仅供交流学习，强烈不建议使用本程序，强烈建议好好学习。<br>
 * 如果你喜欢本程序，不妨点个star支持一下。<br>
 ## 小白使用说明<br>
-* 点击https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/releases/download/0.31/StudyBotGUI.exe下载刷课程序
+* 点击https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/releases/download/0.31/StudyBotGUI.exe 下载刷课程序
 * 安装Firefox浏览器
-* 下载geckodriver驱动程序，64位Windows操作系统请点击https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-win64.zip下载
+* 下载geckodriver驱动程序，64位Windows操作系统请点击https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-win64.zip 下载
 * 阅读使用说明.docx进行操作
 ## 进阶使用说明<br>
 1.  环境配置：<br>
