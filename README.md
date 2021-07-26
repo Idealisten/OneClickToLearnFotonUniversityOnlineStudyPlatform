@@ -30,7 +30,7 @@
 ![云端学习进度推送](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%BA%91%E7%AB%AF%E5%AD%A6%E4%B9%A0%E6%8E%A8%E9%80%81.jpg)<br>
 ![云端学习进度推送到TG](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E6%8E%A8%E9%80%81TG.jpg)<br>
 ![图形界面exe程序](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/GUI.jpg)<br>
-### 部分功能还不是很完善，发现bug请提issue，有空会更新
+### 部分功能还不是很完善，有空(没空)会更新
 # TODOs
 * - [ ] 课后测试题库
 * - [x] 无GUI版本，挂在服务器上24h学习
