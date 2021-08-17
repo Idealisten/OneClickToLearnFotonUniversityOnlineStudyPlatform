@@ -157,6 +157,8 @@ class StudyCousre(QThread):
                             # course_info_list = course_info_orign[0]['children'][0]['children']
                             if len(chapter['children']) == 1:
                                 course_info_list += chapter['children']
+                            elif "id" in chapter:
+                                course_info_list.append(chapter)
                             else:
                                 for sub_chapter in chapter['children']:
                                     course_info_list.append(sub_chapter)
