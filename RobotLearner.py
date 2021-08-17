@@ -141,11 +141,11 @@ def load_course(course_id):
                 # print(course_info_orign[0]['children'][0]['children'])
                 # print(course_info_orign[0]['children'])
 
-                if len(course_info_orign[0]['children'][0]['children']) == 1:
+                # if len(course_info_orign[0]['children'] == 1) and len(course_info_orign[0]['children'][0]['children']) == 1:
+                if len(course_info_orign[0]['children']) == 1:
                     course_info_list = course_info_orign[0]['children']
                     c = True
                 else:
-
                     for chapter in course_info_orign[0]['children']:
                         # course_info_list = course_info_orign[0]['children'][0]['children']
                         if len(chapter['children']) == 1:
@@ -157,13 +157,18 @@ def load_course(course_id):
                                 course_info_list.append(sub_chapter)
                     c = False
 
-                # print(course_info_list)
+                print(course_info_list)
 
                 if not c:
                     for course_info in course_info_list:
                         # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
-                        video_id_list.append(course_info['id'])
-                        video_name_list.append(course_info['text'])
+                        if len(course_info["children"]) != 0:
+                            for sub_course_info in course_info["children"]:
+                                video_id_list.append(sub_course_info['id'])
+                                video_name_list.append(sub_course_info['text'])
+                        else:
+                            video_id_list.append(course_info['id'])
+                            video_name_list.append(course_info['text'])
                 else:
                     for course_info in course_info_list:
                         video_id_list.append(course_info['children'][0]['id'])
@@ -208,7 +213,7 @@ def course_finished(course_id):
     global ONESCREEN
     if ONESCREEN != 1:
 
-        if len(completed_list) == len(course_info_list):
+        if len(completed_list) == len(video_id_list):
             return True
         else:
             return False
