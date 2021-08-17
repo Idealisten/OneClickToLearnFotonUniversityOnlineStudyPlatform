@@ -149,7 +149,8 @@ class StudyCousre(QThread):
                     # print(course_info_orign[0]['children'][0]['children'])
                     # print(course_info_orign[0]['children'])
 
-                    if len(course_info_orign[0]['children'][0]['children']) == 1:
+                    # if len(course_info_orign[0]['children'][0]['children']) == 1:
+                    if len(course_info_orign[0]['children']) == 1:
                         course_info_list = course_info_orign[0]['children']
                         c = True
                     else:
@@ -168,8 +169,13 @@ class StudyCousre(QThread):
                     if not c:
                         for course_info in course_info_list:
                             # video_id_list是全局变量第二次学习时并不会覆盖第一次的id
-                            video_id_list.append(course_info['id'])
-                            video_name_list.append(course_info['text'])
+                            if len(course_info["children"]) != 0:
+                                for sub_course_info in course_info["children"]:
+                                    video_id_list.append(sub_course_info['id'])
+                                    video_name_list.append(sub_course_info['text'])
+                            else:
+                                video_id_list.append(course_info['id'])
+                                video_name_list.append(course_info['text'])
                     else:
                         for course_info in course_info_list:
                             video_id_list.append(course_info['children'][0]['id'])
@@ -212,7 +218,7 @@ class StudyCousre(QThread):
         global ONESCREEN
         if ONESCREEN != 1:
 
-            if len(completed_list) == len(course_info_list):
+            if len(completed_list) == len(video_id_list):
                 return True
             else:
                 return False
