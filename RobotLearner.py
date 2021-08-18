@@ -162,7 +162,7 @@ def load_course(course_id):
                                 course_info_list.append(sub_chapter)
                     c = False
 
-                print(course_info_list)
+                # print(course_info_list)
 
                 if not c:
                     for course_info in course_info_list:
@@ -179,8 +179,8 @@ def load_course(course_id):
                         video_id_list.append(course_info['children'][0]['id'])
                         video_name_list.append(course_info['children'][0]['text'])
 
-                print(video_id_list)
-                print(video_name_list)
+                # print(video_id_list)
+                # print(video_name_list)
 
 
 def get_completed_video_list(course_id):
