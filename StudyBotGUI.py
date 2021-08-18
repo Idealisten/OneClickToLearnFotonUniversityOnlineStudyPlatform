@@ -151,8 +151,13 @@ class StudyCousre(QThread):
 
                     # if len(course_info_orign[0]['children'][0]['children']) == 1:
                     if len(course_info_orign[0]['children']) == 1:
-                        course_info_list = course_info_orign[0]['children']
-                        c = True
+                        if len(course_info_orign[0]['children'][0]['children']) == 1:
+                            course_info_list = course_info_orign[0]['children']
+                            c = True
+                        else:
+                            for sub_chapter in course_info_orign[0]['children'][0]['children']:
+                                course_info_list.append(sub_chapter)
+                            c = False
                     else:
                         for chapter in course_info_orign[0]['children']:
                             # course_info_list = course_info_orign[0]['children'][0]['children']
