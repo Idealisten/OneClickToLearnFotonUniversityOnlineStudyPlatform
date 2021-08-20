@@ -18,14 +18,14 @@
 ##### 自定义选课学习：
 * **StudyBotGUI.exe**&emsp;图形界面学习,exe须和geckodriver位于同级目录，一次可循环添加多门课程<br>
 * **OneClickStudying.py**&emsp;一键秒学<br>
-* **RobotLearner.py**&emsp;一键秒学+挂机学习（针对一些不能秒学的）<br>
-* **OneClickAfterTest.py**&emsp;一键考试（依赖于补考）<br>
+* **RobotLearner.py**&emsp;增强版本：一键秒学+挂机学习（针对一些不能秒学的）<br>
+* **OneClickAfterTest.py**&emsp;一键考试<br>
 ##### 根据学分批量选课学习：
 * **ChooseCourseByCredit.py**&emsp;一键选课（比如你想选所有0.5学分的课）<br>
-* **StudyByCredit.py**&emsp;一键学习（支持课前测试）<br>
-* **ServerStudyBot.py**&emsp;云端一键学习（支持课前测试，支持推送学习进度到手机————依赖于Server酱）<br>
-* **ServerStudyBotTG.py**&emsp;云端一键学习（支持课前测试，支持推送学习进度到手机————依赖于TelegramBot）<br>
-* **CourseEvaluationBySelenium.py**&emsp;一键评价<br>
+* **StudyByCredit.py**&emsp;一键学习指定学分的所有课程（支持课前测试）<br>
+* **ServerStudyBot.py**&emsp;云端一键学习（支持课前测试，支持推送学习进度到手机————Server酱）<br>
+* **ServerStudyBotTG.py**&emsp;云端一键学习（支持课前测试，支持推送学习进度到手机————TelegramBot）<br>
+* **CourseEvaluationBySelenium.py**&emsp;一键评价指定学分所有课程<br>
 * **AfterTest.py**&emsp;一键考试<br>
 ### 示例图片
 ![一键学习](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E5%AD%A6%E4%B9%A0.JPG)<br>
