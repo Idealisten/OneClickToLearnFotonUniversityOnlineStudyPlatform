@@ -3,6 +3,7 @@ from time import sleep
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from ServerStudyBotTG import login, login_ok
 
 course_info_list = []
 fail_list = []
@@ -19,7 +20,9 @@ credit_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7,
 
 template_after_test_url = "http://study.foton.com.cn/els/html/studyCourse/studyCourse.enterCourse.do?courseId={}&studyType=STUDY"
 
-
+username = "caoyue4"
+password = "aufwiedersehen2022!"
+'''
 def judge():
     while True:
         ok = input("输入ok开始课后测试，输入no退出测试：")
@@ -28,25 +31,32 @@ def judge():
         else:
             driver.quit()
             exit(0)
-
+'''
 
 def open_broswer():
-    print("正在打开登录页面，请登录后回到程序输入ok继续执行")
+    print("正在打开登录页面...")
     driver.implicitly_wait(10)
     driver.get("http://study.foton.com.cn")
     driver.maximize_window()
+    login(driver, username, password)
+    while not login_ok(driver):
+        driver.refresh()
+        sleep(2)
+        login(driver)
+    print("登录成功")
 
 
 def load_course():
     global select_credit
-    with open('./course_data.txt', 'r', encoding='utf-8') as f:
-        line = f.readline()
+    with open('./course_progress.txt', 'r', encoding='utf-8') as f:
+        # line = f.readline()
         line = f.readline()
         while line:
             line_list = line.strip().split(',')
-            credit = line_list[-2]
+            # credit = line_list[-2]
             qualification = line_list[-1]
-            if credit == select_credit and qualification == "课后测试":
+            # if credit == select_credit and qualification == "课后测试":
+            if "课后测试" in qualification:
                 course_info_list.append(line)
             line = f.readline()
 
@@ -221,7 +231,21 @@ def make_after_test(course_name):
                         print("课程《{}》课后测试通过".format(course_name))
             else:
                 # 这是第二次考试，无法找到答案，请手工考试
-                print("这是第二次考试，无法记录答案，请手工考试")
+                print("这是第二次考试，无法记录答案，需要重新学习")
+                form_choice = courseInfoForm.find_element_by_class_name("form_choice")
+                question_item_list = form_choice.find_elements_by_class_name("question-item")
+                for i, question_item in enumerate(question_item_list):
+                    print("正在做第{}题".format(i + 1))
+                    p_list = question_item.find_elements_by_tag_name("p")
+                    span = p_list[1].find_element_by_tag_name("span")
+                    choice = span.find_element_by_tag_name("input")
+                    choice.click()
+                    sleep(0.5)
+                sleep(0.5)
+                from_confirm = driver.find_element_by_class_name("from_confirm")
+                submit_button = from_confirm.find_element_by_id("goNext")
+                submit_button.click()
+                sleep(3)
                 fail_num += 1
                 fail_list.append(course_name)
         else:
@@ -240,32 +264,33 @@ def end_after_test():
 
 
 if __name__ == "__main__":
-
+    '''
     print("课程学分：" + str(credit_list))
     select_credit = input("请输入要课后测试的课程的学分：")
     if float(select_credit) not in credit_list:
         print("输入错误。告辞")
         exit(0)
     else:
-        load_course()
-        driver = webdriver.Firefox()
-        open_broswer()
-        judge()
-        
-        for course_info in course_info_list:
-            course_line_list = course_info.strip().split(',')
-            course_id = course_line_list[-3]
-            course_name = course_line_list[-4]
-            after_test_url = template_after_test_url.format(course_id)
-            driver.get(after_test_url)
-            sleep(1)
-            print("正在课后测试《{}》课程".format(course_name))
-            try:
-                make_after_test(course_name)
-            except:
-                print("课程《{}》课后测试未通过".format(course_name))
-                fail_num += 1
-                fail_list.append(course_name)
-        driver.quit()
-        end_after_test()
+    '''
+    load_course()
+    driver = webdriver.Firefox()
+    open_broswer()
+    # judge()
+
+    for course_info in course_info_list:
+        course_line_list = course_info.strip().split(',')
+        course_id = course_line_list[1]
+        course_name = course_line_list[0]
+        after_test_url = template_after_test_url.format(course_id)
+        driver.get(after_test_url)
+        sleep(1)
+        print("正在课后测试《{}》课程".format(course_name))
+        try:
+            make_after_test(course_name)
+        except:
+            print("课程《{}》课后测试未通过".format(course_name))
+            fail_num += 1
+            fail_list.append(course_name)
+    driver.quit()
+    end_after_test()
 

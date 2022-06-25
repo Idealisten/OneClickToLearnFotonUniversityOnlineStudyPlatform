@@ -40,13 +40,16 @@ def open_broswer():
 
 def load_course():
     global select_credit
-    with open('./course_data.txt', 'r', encoding='utf-8') as f:
+    with open('./course_progress.txt', 'r', encoding='utf-8') as f:
         line = f.readline()
         line = f.readline()
         while line:
             line_list = line.strip().split(',')
-            credit = line_list[-2]
-            if credit == select_credit:
+            # credit = line_list[-2]
+            qualification = line_list[-2]
+            progress = line_list[-1]
+            # if credit == select_credit and qualification == "课后测试":
+            if qualification == "课后测试" and progress == "学习进度:课程评估":
                 course_info_list.append(line)
             line = f.readline()
 
@@ -100,32 +103,34 @@ def end_evalustion():
 
 
 if __name__ == "__main__":
+    '''
     print("课程学分：" + str(credit_list))
     select_credit = input("请输入要评估的课程的学分：")
     if float(select_credit) not in credit_list:
         print("输入错误。告辞")
         exit(0)
     else:
-        load_course()
-        driver = webdriver.Firefox()
-        open_broswer()
-        judge()
-        for course_info in course_info_list:
-            course_line_list = course_info.strip().split(',')
-            course_id = course_line_list[-3]
-            course_name = course_line_list[-4]
-            evaluation_url = template_evaluation_url.format(course_id)
-            driver.get(evaluation_url)
-            sleep(3)
+    '''
+    load_course()
+    driver = webdriver.Firefox()
+    open_broswer()
+    judge()
+    for course_info in course_info_list:
+        course_line_list = course_info.strip().split(',')
+        course_id = course_line_list[1]
+        course_name = course_line_list[0]
+        evaluation_url = template_evaluation_url.format(course_id)
+        driver.get(evaluation_url)
+        # sleep(3)
 
-            try:
-                evaluation()
-            except:
-                print("课程《{}》评估失败".format(course_name))
-                fail_num += 1
-                fail_list.append(course_name)
-            else:
-                print("课程《{}》评估完成".format(course_name))
-                success_num += 1
-        driver.quit()
-        end_evalustion()
+        try:
+            evaluation()
+        except:
+            print("课程《{}》评估失败".format(course_name))
+            fail_num += 1
+            fail_list.append(course_name)
+        else:
+            print("课程《{}》评估完成".format(course_name))
+            success_num += 1
+    driver.quit()
+    end_evalustion()

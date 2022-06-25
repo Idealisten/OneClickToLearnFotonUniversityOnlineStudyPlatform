@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import re
 from email.mime.text import MIMEText
 import smtplib
 
@@ -94,13 +95,14 @@ def show_time():
 
 
 def open_broswer():
-    driver.implicitly_wait(20)
+    driver.implicitly_wait(10)
     driver.get("http://study.foton.com.cn")
 
 
-def login():
+def login(driver, username, password):
+    driver = driver
     print("登录中...")
-    sleep(10)
+    sleep(2)
     usrname = driver.find_element_by_id('loginName')
     usrname.click()
     usrname.send_keys(username)
@@ -109,13 +111,14 @@ def login():
     passwd.click()
     passwd.send_keys(password)
 
-    sleep(2)
+    sleep(1)
 
     ele = driver.find_element_by_css_selector("#fm1 > input.btn.btn-block.btn-primary.btn-lg")
     ele.click()
 
 
-def login_ok():
+def login_ok(driver):
+    driver = driver
     if driver.current_url == "http://study.foton.com.cn/os/html/index.init.do":
         # 登录成功
         return True
@@ -125,14 +128,24 @@ def login_ok():
 
 def load_course():
     global select_credit
-    with open('./course_data.txt', 'r', encoding='utf-8') as f:
+    with open('./course_progress.txt', 'r', encoding='utf-8') as f:
         line = f.readline()
         line = f.readline()
         while line:
             line_list = line.strip().split(',')
             credit = line_list[-2]
-            if credit == select_credit:
+            # if credit == select_credit:
+            # course_info_list.append(line)
+            # line = f.readline()
+
+            learning_progress_text = line_list[-1]
+            conditions_of_completion = line_list[-2]
+            if "课前测试" in learning_progress_text:
                 course_info_list.append(line)
+            else:
+                learning_progress = re.match(r'.*课程学习(\d*)%', learning_progress_text)
+                if learning_progress is not None:
+                    course_info_list.append(line)
             line = f.readline()
 
 
@@ -141,7 +154,7 @@ def select_video(course_id, video_id):
     select_video_data['scoId'] = video_id
     select_video_data['elsSign'] = cookie['eln_session_id']
     study_check_api = study_check_api_tmp.format(course_id, video_id)
-    sleep(5)
+    sleep(2)
     try:
         post(select_resource_api, headers=header, cookies=cookie, data=select_video_data, timeout=(15, 15))
         post(study_check_api, headers=header, cookies=cookie, data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
@@ -226,9 +239,9 @@ def video_finished(course_id, video_id, course_name, video_name):
 
 
 def pre_test():
-    sleep(15)
+    sleep(3)
     form = driver.find_element_by_id("coursePretestForm")
-    sleep(5)
+    sleep(3)
     try:
         h2 = form.find_element_by_tag_name("h2")
     except:
@@ -247,22 +260,22 @@ def pre_test():
         from_confirm = driver.find_element_by_class_name("from_confirm")
         submit_button = from_confirm.find_element_by_id("coursePretestSubmit")
         submit_button.click()
-        sleep(5)
+        sleep(3)
         next_step = driver.find_element_by_id("upCoursePretestGoNextBtn")
         next_step.click()
-        sleep(5)
+        sleep(3)
         learn()
     else:
         if h2.text == "（无试题）":
             button = driver.find_element_by_class_name("from_confirm").find_element_by_tag_name("button")
             button.click()
-            sleep(5)
+            sleep(3)
             learn()
 
 
 def is_finished():
     global success_num
-    sleep(15)
+    sleep(3)
     try:
         # 通过课程进度判断课程是否学习完成，span.text == '100'说明已经学完了
         # span = driver.find_element_by_id("studyProgress")
@@ -322,11 +335,11 @@ def learn():
     global success_num
     global fail_num
     global course_timeout
-    sleep(15)
+    sleep(3)
     play_button = WebDriverWait(driver, 15, 0.5).until(
         EC.presence_of_element_located((By.ID, 'courseRp_sel')))
     play_button.click()
-    sleep(5)
+    sleep(3)
     get_cookie()
     data_single['courseId'] = course_id
     data_double['courseId'] = course_id
@@ -412,7 +425,7 @@ def learn():
                              data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
                         sleep(180)
                         t += 1
-                        if t > 30:
+                        if t > 20:
                             print("{} 视频学习超时".format(video_title))
                             course_timeout = 1
                             break
@@ -453,7 +466,8 @@ def end_study():
 
 if __name__ == "__main__":
     print("课程学分：" + str(credit_list))
-    select_credit = input("请输入要学习的课程的学分：")
+    # select_credit = input("请输入要学习的课程的学分：")
+    select_credit = "1"
     if float(select_credit) not in credit_list:
         print("输入错误。告辞")
         exit(0)
@@ -462,24 +476,29 @@ if __name__ == "__main__":
         load_course()
         # driver = webdriver.Firefox()
         options = webdriver.FirefoxOptions()
-        options.add_argument('-headless')
-        driver = webdriver.Firefox(options=options)
+        # options.add_argument('-headless')
+        # driver = webdriver.Firefox(options=options)
+        driver = webdriver.Firefox()
         open_broswer()
-        username = input("请输入用户名：")
-        password = input("请输入密码：")
-        bot_token = input("请输入TelegramBotToken: ")
-        bot_chatID = input("请输入chat_id: ")
+        # username = input("请输入用户名：")
+        # password = input("请输入密码：")
+        # bot_token = input("请输入TelegramBotToken: ")
+        # bot_chatID = input("请输入chat_id: ")
+        username = "caoyue4"
+        password = "aufwiedersehen2022$"
+        bot_token = "853983980:AAH0DQ6dLjDYLrxOIwfZiX3X0FopFHBsW8A"
+        bot_chatID = "513187498"
         notification_api = notification_api_tmp.format(bot_token, bot_chatID)
-        login()
-        while not login_ok():
+        login(driver,username,password)
+        while not login_ok(driver):
             driver.refresh()
             sleep(2)
-            login()
+            login(driver,username,password)
         print("登录成功")
         for c, course_info in enumerate(course_info_list):
             course_line_list = course_info.strip().split(',')
-            course_id = course_line_list[-3]
-            course_name = course_line_list[-4]
+            course_id = course_line_list[-4]
+            course_name = course_line_list[-5]
             play_url = template_play_url.format(course_id)
             driver.switch_to.window(driver.window_handles[0])
             driver.get(play_url)
