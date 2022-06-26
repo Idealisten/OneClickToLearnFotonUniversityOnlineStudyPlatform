@@ -14,7 +14,7 @@ chrome.maximize_window()
 
 def login():
     account = "caoyue4"
-    password = "aufwiedersehen2022!"
+    password = "aufwiedersehen2022$"
 
     ele = chrome.find_element_by_id("loginName")
     ele.click()
@@ -56,7 +56,6 @@ def find_courses_progress():
         my_course = WebDriverWait(chrome, 15, 0.5).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, '#study-task')))
         my_course.click()
-        time.sleep(5)
         studying = WebDriverWait(chrome, 15, 0.5).until(
             EC.presence_of_element_located((By.CSS_SELECTOR,
                                             '#studyTaskPanel > div > div.filter-list.tbc-els-filter-list > dl:nth-child(2) > dd > span:nth-child(3)')))
@@ -68,7 +67,7 @@ def find_courses_progress():
             last_page = 1
         current_page = 1
         for i in range(1, last_page + 1):
-            time.sleep(18)
+            time.sleep(8)
             div = WebDriverWait(chrome, 15, 0.5).until(EC.presence_of_element_located((By.ID, 'studyTaskList')))
             section = WebDriverWait(div, 15, 0.5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#studyTaskList > section')))
             # section = div.find_element_by_css_selector('#studyTaskList > section')

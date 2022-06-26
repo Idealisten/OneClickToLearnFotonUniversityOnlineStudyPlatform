@@ -25,6 +25,12 @@ study_check_api_tmp = "http://study.foton.com.cn/els/html/coursestudyrecord/cour
 scols_complate_api_tmp = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.scoIsComplate.do?courseId={}&processType=THREESCREEN"
 # 单分屏获取播放进度api
 one_screen_save_progress_api = "http://study.foton.com.cn/els/html/courseStudyItem/courseStudyItem.saveCoursePrecent.do"
+# 课程评估页面url模板
+template_evaluation_url = "http://study.foton.com.cn/els/html/studyCourse/studyCourse.enterCourse.do?courseId={}&studyType=STUDY"
+# 课程简介页面url模板
+template_course_info_url = "http://study.foton.com.cn/els/html/course/course.courseInfo.do?courseId={}&p="
+# 课后测试页面url模板
+template_after_test_url = "http://study.foton.com.cn/els/html/studyCourse/studyCourse.enterCourse.do?courseId={}&studyType=STUDY"
 
 course_id_list = []
 cookie = {}
@@ -295,6 +301,277 @@ class StudyCousre(QThread):
             else:
                 return False
 
+    def course_evaluation(self, course_id):
+        global course_name
+        evaluation_url = template_evaluation_url.format(course_id)
+
+        def do_evaluation():
+            driver.switch_to.window(driver.window_handles[1])
+            span = WebDriverWait(driver, 15, 0.5).until(EC.presence_of_element_located((By.ID, 'star')))
+            a_list = span.find_elements_by_tag_name('a')
+            a_list[4].click()
+            form_choice = WebDriverWait(driver, 15, 0.5).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'form_choice')))
+            question_list = form_choice.find_elements_by_tag_name("div")
+            for question in question_list[:-1]:
+                p_list = question.find_elements_by_tag_name("p")
+                p6 = p_list[1]
+                input_button = p6.find_element_by_tag_name("input")
+                input_button.click()
+            q5 = question_list[-1]
+            textarea = q5.find_element_by_tag_name("textarea")
+            textarea.click()
+            textarea.send_keys("听君一席话，胜读十年书！")
+            submit = driver.find_element_by_id("courseEvaluateSubmit")
+            submit.click()
+            table = driver.find_element_by_id("button0ButtonPanel")
+            table.click()
+            view = driver.find_element_by_id("courseEvaluateViewBtn")
+            view.click()
+            sleep(1)
+
+        def evaluation():
+            driver.switch_to.window(driver.window_handles[1])
+            try:
+                studyProgress = WebDriverWait(driver, 15, 0.5).until(
+                    EC.presence_of_element_located((By.ID, "studyProgress"))
+                )
+                score = studyProgress.text
+                if score == "100":
+                    # 学完了，可以开始评估
+                    courseStudyCourseGoNext = driver.find_element_by_id("courseStudyCourseGoNext")
+                    courseStudyCourseGoNext.click()
+                    sleep(6)
+                    do_evaluation()
+            except:
+                do_evaluation()
+
+        driver.get(evaluation_url)
+        sleep(4)
+        self.show_time()
+        self.signal.emit("课程《{}》评估开始\n".format(course_name))
+        try:
+            evaluation()
+        except:
+            self.show_time()
+            self.signal.emit("课程《{}》评估失败\n".format(course_name))
+        else:
+            self.show_time()
+            self.signal.emit("课程《{}》评估完成\n".format(course_name))
+
+    def course_quiz(self, course_id):
+        global course_name
+        course_info_url = template_course_info_url.format(course_id)
+        driver.switch_to.window(driver.window_handles[1])
+        driver.get(course_info_url)
+        sleep(3)
+        td_conditions_of_completion = WebDriverWait(driver, 15, 0.5).until(
+                    EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div[2]/div/div[1]/div[2]/div[2]/table/tbody/tr[4]/td")))
+
+        def do_quiz():
+            questions_list = []
+            correct_answers_list = []
+
+            try:
+                # 弹出提示框：考试时间还剩5分钟，抓紧时间。需要点确定
+                abcenter_inner = driver.find_element_by_class_name("abcenter_inner")
+                table = abcenter_inner.find_element_by_tag_name("div").find_element_by_tag_name("table")
+                confirm_button = table.find_element_by_tag_name("tbody").find_elements_by_tag_name("tr")[
+                    1].find_elements_by_tag_name("td")[1].find_element_by_tag_name("input")
+                confirm_button.click()
+                sleep(1)
+            except:
+                # 点击确定后开始第一次做题
+                sleep(5)
+                courseInfoForm = driver.find_element_by_id("courseInfoForm")
+                h1 = courseInfoForm.find_element_by_class_name("main_title")
+                span = h1.find_element_by_tag_name("span")
+                if span.text == "课后测试":
+                    # 在课后测试页面
+                    test_info = courseInfoForm.find_element_by_class_name("test_info")
+                    em_list = test_info.find_elements_by_tag_name("em")
+                    em = em_list[2]
+                    if em.text == "1":
+                        # 这是第一次考试,可以找到答案
+                        print("正在第一次课后测试")
+                        self.show_time()
+                        self.signal.emit("正在进行第一次课后测试\n")
+                        form_choice = courseInfoForm.find_element_by_class_name("form_choice")
+                        question_item_list = form_choice.find_elements_by_class_name("question-item")
+                        for i, question_item in enumerate(question_item_list):
+                            print("正在做第{}题".format(i + 1))
+                            p_list = question_item.find_elements_by_tag_name("p")
+                            span = p_list[1].find_element_by_tag_name("span")
+                            choice = span.find_element_by_tag_name("input")
+                            choice.click()
+                            sleep(0.5)
+                        sleep(0.5)
+                        from_confirm = driver.find_element_by_class_name("from_confirm")
+                        submit_button = from_confirm.find_element_by_id("goNext")
+                        submit_button.click()
+                        sleep(3)
+                        print("第一次测试已提交")
+                        # 提交后点查看结果
+                        message = WebDriverWait(driver, 15, 1).until(
+                            EC.presence_of_element_located((By.ID, "courseExamMsgBody"))
+                        )
+                        # message = driver.find_element_by_id("courseExamMsgBody")
+                        pointreson = message.find_element_by_class_name("pointreson")
+                        p = pointreson.find_element_by_tag_name("p")
+                        score = p.find_elements_by_tag_name("b")[0].text
+                        sleep(2)
+                        print(p.text)
+                        if float(score) >= 80:
+                            # 运气好，一次通过课后测试，点查看结果
+                            self.signal.emit("课程《{}》第一次课后测试通过，获得{}分\n".format(course_name, score))
+                            div = message.find_elements_by_tag_name("div")[1]
+                            courseExamMsgViewBtn = div.find_element_by_id("courseExamMsgViewBtn")
+                            courseExamMsgViewBtn.click()
+                            sleep(6)
+                        else:
+                            # 点查看结果，记录答案
+                            self.show_time()
+                            self.signal.emit("很遗憾，课程《{}》第一次课后测试失败，获得{}分，还有1次补考机会，开始记录答案\n".format(course_name, score))
+                            div = message.find_elements_by_tag_name("div")[1]
+                            courseExamMsgViewBtn = div.find_element_by_id("courseExamMsgViewBtn")
+                            courseExamMsgViewBtn.click()
+                            sleep(1)
+                            # 点击查看结果按钮后跳转到展示答案页面，在此处记录答案
+                            courseInfoForm = driver.find_element_by_id("courseInfoForm")
+                            form_choice = courseInfoForm.find_element_by_class_name("form_choice")
+                            log_question_item_list = form_choice.find_elements_by_class_name("question-item")
+                            question_text_list = []
+                            for j, question_item in enumerate(log_question_item_list):
+                                # self.signal.emit("正在记录第{}题答案".format(j + 1))
+
+                                # 还得去掉题目前的序号和点
+                                answers_text_list = []
+                                original_question_list = question_item.find_element_by_class_name(
+                                    "choice_tit").text.split(" ")[1:]
+                                question = ""
+                                for x, q in enumerate(original_question_list):
+                                    question = question + q
+                                    if x < len(original_question_list) - 1:
+                                        question = question + " "
+                                questions_list.append(question)
+
+                                self.signal.emit("第{}题题目是【{}】".format(j+1, question))
+
+                                choice_list = question_item.find_elements_by_tag_name("p")[1:]
+                                for c, choice in enumerate(choice_list):
+
+                                    try:
+                                        image = choice.find_element_by_tag_name("img")
+                                    except:
+                                        # 没找到标记，这个选项不是正确答案
+                                        pass
+                                    else:
+                                        # 找到了，记录正确答案
+                                        # answer_choice = choice.find_element_by_tag_name("span").find_element_by_tag_name("span").text
+                                        answer_text = choice.find_element_by_tag_name(
+                                            "span").find_element_by_tag_name("label").text
+                                        self.signal.emit("第{}题正确答案是【{}】\n".format(j+1, answer_text))
+                                        answers_text_list.append(answer_text)
+
+                                print(answers_text_list)
+
+                                # question_text_list.append({question: answers_text_list})
+                                correct_answers_list.append(answers_text_list)
+                            sleep(4)
+                            makeup_exam = driver.find_element_by_class_name(
+                                "from_confirm").find_element_by_tag_name("button")
+                            makeup_exam.click()
+                            sleep(10)
+                            print("开始补考")
+                            courseInfoForm = WebDriverWait(driver, 15, 1).until(
+                                EC.presence_of_element_located((By.ID, "courseInfoForm"))
+                            )
+                            # courseInfoForm = driver.find_element_by_id("courseInfoForm")
+                            form_choice = courseInfoForm.find_element_by_class_name("form_choice")
+                            makeup_question_item_list = form_choice.find_elements_by_class_name("question-item")
+                            for k, makeup_question_item in enumerate(makeup_question_item_list):
+                                self.show_time()
+                                self.signal.emit("正在补考第{}题".format(k + 1))
+                                sleep(0.5)
+                                show = 1
+                                original_makeup_question_text_list = makeup_question_item.find_element_by_class_name(
+                                    "choice_tit").text.split(" ")[1:]
+                                makeup_question_text = ""
+                                for x, q in enumerate(original_makeup_question_text_list):
+                                    makeup_question_text = makeup_question_text + q
+                                    if x < len(original_makeup_question_text_list) - 1:
+                                        makeup_question_text = makeup_question_text + " "
+
+                                self.signal.emit("补考题目是：【{}】".format(makeup_question_text))
+
+                                if makeup_question_text in questions_list:
+                                    index = questions_list.index(makeup_question_text)
+                                    correct_answer_list = correct_answers_list[index]
+                                    makeup_choice_list = makeup_question_item.find_elements_by_tag_name("p")[1:]
+                                    for makeup_choice in makeup_choice_list:
+                                        span = makeup_choice.find_element_by_tag_name("span")
+                                        label = span.find_element_by_tag_name("label")
+                                        answer = label.text
+                                        if answer in correct_answer_list:
+                                            label.click()
+                                            sleep(0.2)
+
+                                            self.signal.emit("正确答案是：【{}】\n".format(answer))
+                                else:
+                                    self.signal.emit("该题目【{}】 在第一次测试时未出现，没有记录正确答案\n".format(makeup_question_text))
+                                    makeup_choice_list = makeup_question_item.find_elements_by_tag_name("p")[1:]
+                                    # 随便选一个B
+                                    makeup_choice = makeup_choice_list[1]
+                                    span = makeup_choice.find_element_by_tag_name("span")
+                                    label = span.find_element_by_tag_name("label")
+                                    label.click()
+                                    sleep(0.2)
+
+                            from_confirm = driver.find_element_by_class_name("from_confirm")
+                            goNext = from_confirm.find_element_by_tag_name("input")
+                            goNext.click()
+                            sleep(10)
+                            courseExamMsgBody = WebDriverWait(driver, 15, 1).until(
+                                EC.presence_of_element_located((By.ID, "courseExamMsgBody"))
+                            )
+                            # courseExamMsgBody = driver.find_element_by_id("courseExamMsgBody")
+                            pointreson = courseExamMsgBody.find_element_by_class_name("pointreson")
+                            p = pointreson.find_element_by_tag_name("p")
+                            print(course_name)
+                            print(p.text)
+                            makeup_score = p.find_element_by_tag_name("b").text
+                            if float(makeup_score) >= 60:
+                                self.show_time()
+                                self.signal.emit("课程《{}》课后测试通过，获得{}分\n".format(course_name, makeup_score))
+                    else:
+                        # 这是第二次考试，无法找到答案，请手工考试
+                        self.show_time()
+                        self.signal.emit("这是第二次考试，无法记录答案，请在答题结束后重新学习")
+                        form_choice = courseInfoForm.find_element_by_class_name("form_choice")
+                        question_item_list = form_choice.find_elements_by_class_name("question-item")
+                        for i, question_item in enumerate(question_item_list):
+                            print("正在做第{}题".format(i + 1))
+                            p_list = question_item.find_elements_by_tag_name("p")
+                            span = p_list[1].find_element_by_tag_name("span")
+                            choice = span.find_element_by_tag_name("input")
+                            choice.click()
+                            sleep(0.5)
+                        sleep(0.5)
+                        from_confirm = driver.find_element_by_class_name("from_confirm")
+                        submit_button = from_confirm.find_element_by_id("goNext")
+                        submit_button.click()
+                        sleep(3)
+                else:
+                    # 不在课后测试页面
+                    pass
+        if td_conditions_of_completion.text == "课后测试":
+            after_test_url = template_after_test_url.format(course_id)
+            driver.switch_to.window(driver.window_handles[1])
+            driver.get(after_test_url)
+            sleep(6)
+            do_quiz()
+
+
     def clear_list(self):
         video_id_list.clear()
         video_name_list.clear()
@@ -365,6 +642,8 @@ class StudyCousre(QThread):
                     sleep(1)
                 self.clear_list()
             sleep(1)
+            self.course_evaluation(course_id)
+            self.course_quiz(course_id)
             ONESCREEN = -1
         course_id_list.clear()
         course_url_list.clear()
