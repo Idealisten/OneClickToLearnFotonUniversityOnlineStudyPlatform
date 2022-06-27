@@ -13,8 +13,8 @@ chrome.maximize_window()
 
 
 def login():
-    account = "caoyue4"
-    password = "aufwiedersehen2022$"
+    account = input("请输入用户名：")
+    password = input("请输入密码：")
 
     ele = chrome.find_element_by_id("loginName")
     ele.click()

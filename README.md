@@ -5,7 +5,7 @@
 * 本程序仅供交流学习，强烈不建议使用本程序，强烈建议好好学习。<br>
 * 如果你喜欢本程序，不妨点个star支持一下。<br>
 ## 小白使用说明<br>
-* 下载[刷课程序](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/releases/download/0.41/StudyBotGUI.exe)
+* 下载[刷课程序](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/releases/download/0.99/StudyBotGUI.exe)
 * 安装[Firefox浏览器](https://cdn.stubdownloader.services.mozilla.com/builds/firefox-stub/zh-CN/win/0244b03ff75452eec43ebfcabbe3fa2feda8105e3c426bd77b3d801cf01c05c7/Firefox%20Installer.exe)
 * 下载geckodriver驱动程序，64位Windows操作系统请[点此](https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckodriver-v0.29.1-win64.zip)下载
 * 下载[使用说明](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/raw/master/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.docx)
@@ -17,16 +17,19 @@
 ### 2. 功能说明：<br>
 ##### 自定义选课学习：
 * **StudyBotGUI.exe**&emsp;图形界面学习,exe须和geckodriver位于同级目录，一次可循环添加多门课程<br>
-* **OneClickStudying.py**&emsp;一键秒学<br>
-* **RobotLearner.py**&emsp;增强版本：一键秒学+挂机学习（针对一些不能秒学的）<br>
-* **OneClickAfterTest.py**&emsp;一键考试<br>
+* **RobotLearner.py**&emsp;一键秒学+挂机自动学习<br>
+* **OneClickAfterTest.py**&emsp;手动选课，一键考试<br>
 ##### 根据学分批量选课学习：
-* **ChooseCourseByCredit.py**&emsp;一键选课（比如你想选所有0.5学分的课）<br>
+* **GetAllCourseData.py**&emsp;获取当前福田大学中所有课程信息，保存在当前目录下的course_data.txt<br>
+* **ChooseCourseByCredit.py**&emsp;&emsp;获取当前福田大学中所有我已经选课的课程信息，保存在当前目录下的course_progress.txt<br>
+* 以下功能均需在获取课程信息的基础上进行
+* **ChooseCourseByCredit.py**&emsp;按照学分批量选课<br>
 * **StudyByCredit.py**&emsp;一键学习指定学分的所有课程（支持课前测试）<br>
-* **ServerStudyBot.py**&emsp;云端一键学习（支持课前测试，支持推送学习进度到手机————Server酱）<br>
-* **ServerStudyBotTG.py**&emsp;云端一键学习（支持课前测试，支持推送学习进度到手机————TelegramBot）<br>
+* **ServerStudyBot.py**&emsp;云端Linux服务器一键学习（支持课前测试）<br>
+* **ServerStudyBotTG.py**&emsp;云端Linux服务器一键学习（支持课前测试，支持推送学习进度到TelegramBot）<br>
 * **CourseEvaluationBySelenium.py**&emsp;一键评价指定学分所有课程<br>
-* **AfterTest.py**&emsp;一键考试<br>
+* **AfterTest.py**&emsp;一键考试指定学分的所有课程<br>
+* **study.py**&emsp;study.ui生成的UI代码<br>
 ### 示例图片
 ![一键学习](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E5%AD%A6%E4%B9%A0.JPG)<br>
 ![一键选课](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%B8%80%E9%94%AE%E9%80%89%E8%AF%BE.JPG)<br>
@@ -34,8 +37,3 @@
 ![云端学习进度推送](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%BA%91%E7%AB%AF%E5%AD%A6%E4%B9%A0%E6%8E%A8%E9%80%81.jpg)<br>
 ![云端学习进度推送到TG](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E6%8E%A8%E9%80%81TG.jpg)<br>
 ![图形界面exe程序](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/GUI.jpg)<br>
-### 部分功能还不是很完善，有空(没空)会更新
-# TODOs
-* - [ ] 课后测试题库
-* - [x] 无GUI版本，挂在服务器上24h学习
-* - [x] 发布GUI版本

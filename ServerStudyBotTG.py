@@ -480,14 +480,10 @@ if __name__ == "__main__":
         # driver = webdriver.Firefox(options=options)
         driver = webdriver.Firefox()
         open_broswer()
-        # username = input("请输入用户名：")
-        # password = input("请输入密码：")
-        # bot_token = input("请输入TelegramBotToken: ")
-        # bot_chatID = input("请输入chat_id: ")
-        username = "caoyue4"
-        password = "aufwiedersehen2022$"
-        bot_token = "853983980:AAH0DQ6dLjDYLrxOIwfZiX3X0FopFHBsW8A"
-        bot_chatID = "513187498"
+        username = input("请输入用户名：")
+        password = input("请输入密码：")
+        bot_token = input("请输入TelegramBotToken: ")
+        bot_chatID = input("请输入chat_id: ")
         notification_api = notification_api_tmp.format(bot_token, bot_chatID)
         login(driver,username,password)
         while not login_ok(driver):
