@@ -37,3 +37,6 @@
 ![云端学习进度推送](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E4%BA%91%E7%AB%AF%E5%AD%A6%E4%B9%A0%E6%8E%A8%E9%80%81.jpg)<br>
 ![云端学习进度推送到TG](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/%E6%8E%A8%E9%80%81TG.jpg)<br>
 ![图形界面exe程序](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/GUI.jpg)<br>
+
+![自动完成课后测试](https://github.com/Idealisten/OneClickToLearnFotonUniversityOnlineStudyPlatform/blob/master/Images/GUI%E8%AF%BE%E5%90%8E%E6%B5%8B%E8%AF%95%E6%88%AA%E5%9B%BE.png)<br>
+
