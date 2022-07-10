@@ -24,6 +24,7 @@ course_info_list = []
 course_id = ''
 course_name = ''
 course_timeout = 0
+video_progress = -1
 
 header = {
     'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -193,6 +194,8 @@ def video_finished(course_id, video_id, course_name, video_name):
     """
     判断视频是否播放完毕
     """
+    global video_progress
+    video_progress = -1    # 每个视频播放前将视频进度重置为-1，防止上个视频卡住的进度恰好与当前视频上次播放的进度相等导致误判当前视频也卡住
     data_double['courseId'] = course_id
     data_double['scoId'] = video_id
     completed_list = get_completed_video_list(course_id)
@@ -225,13 +228,17 @@ def video_finished(course_id, video_id, course_name, video_name):
                     if r_dict['completed'] == 'true':
                         return True
                     else:
-                        show_time()
-                        print("{}视频播放进度{}%，{}课程学习进度{}%".format(video_name, r_dict['completeRate'],
-                                                               course_name, r_dict['courseProgress']))
-                        progress = "{} 视频播放进度{}%，{} 课程学习进度{}%".format(video_name, r_dict['completeRate'],
-                                                                      course_name, r_dict['courseProgress'])
-                        push_notification(progress)
-                        return False
+                        if r_dict['completeRate'] == video_progress:
+                            return True
+                        else:
+                            video_progress = r_dict['completeRate']
+                            show_time()
+                            print("{}视频播放进度{}%，{}课程学习进度{}%".format(video_name, r_dict['completeRate'],
+                                                                   course_name, r_dict['courseProgress']))
+                            progress = "{} 视频播放进度{}%，{} 课程学习进度{}%".format(video_name, r_dict['completeRate'],
+                                                                          course_name, r_dict['courseProgress'])
+                            push_notification(progress)
+                            return False
                 else:
                     return False
         else:
@@ -335,6 +342,7 @@ def learn():
     global success_num
     global fail_num
     global course_timeout
+    global video_progress
     sleep(3)
     play_button = WebDriverWait(driver, 15, 0.5).until(
         EC.presence_of_element_located((By.ID, 'courseRp_sel')))
@@ -424,6 +432,7 @@ def learn():
                         post(update_time_api, headers=header, cookies=cookie,
                              data={'elsSign': cookie['eln_session_id']}, timeout=(15, 15))
                         sleep(180)
+
                         t += 1
                         if t > 20:
                             print("{} 视频学习超时".format(video_title))
