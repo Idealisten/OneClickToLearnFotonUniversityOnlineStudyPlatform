@@ -195,7 +195,6 @@ def video_finished(course_id, video_id, course_name, video_name):
     判断视频是否播放完毕
     """
     global video_progress
-    video_progress = -1    # 每个视频播放前将视频进度重置为-1，防止上个视频卡住的进度恰好与当前视频上次播放的进度相等导致误判当前视频也卡住
     data_double['courseId'] = course_id
     data_double['scoId'] = video_id
     completed_list = get_completed_video_list(course_id)
@@ -415,6 +414,7 @@ def learn():
             push_notification(info)
         else:
             for index, vid in enumerate(vid_list):
+                video_progress = -1  # 每个视频播放前将视频进度重置为-1，防止上个视频卡住的进度恰好与当前视频上次播放的进度相等导致误判当前视频也卡住
                 t = 0
                 sleep(1)
                 video_title = title_list[index]
