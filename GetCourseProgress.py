@@ -6,6 +6,10 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import re
 
+error_page_list = []
+error_classes_name_list = []
+error_classes_id_list = []
+
 chrome = webdriver.Chrome()
 chrome.implicitly_wait(10)
 chrome.get("http://study.foton.com.cn")
@@ -55,55 +59,66 @@ def find_courses_progress():
         time.sleep(5)
         my_course = WebDriverWait(chrome, 15, 0.5).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, '#study-task')))
+        time.sleep(1)
         my_course.click()
         studying = WebDriverWait(chrome, 15, 0.5).until(
             EC.presence_of_element_located((By.CSS_SELECTOR,
                                             '#studyTaskPanel > div > div.filter-list.tbc-els-filter-list > dl:nth-child(2) > dd > span:nth-child(3)')))
         studying.click()
-
+        time.sleep(3)
         try:
             last_page = int(chrome.find_element_by_class_name('pagnum-last').text)
         except:
             last_page = 1
+        print("共{}页课程正在学习中".format(last_page))
         current_page = 1
-        for i in range(1, last_page + 1):
-            time.sleep(8)
+        while current_page <= last_page:
             div = WebDriverWait(chrome, 15, 0.5).until(EC.presence_of_element_located((By.ID, 'studyTaskList')))
             section = WebDriverWait(div, 15, 0.5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#studyTaskList > section')))
             # section = div.find_element_by_css_selector('#studyTaskList > section')
             ul = section.find_element_by_tag_name('ul')
             li_list = ul.find_elements_by_tag_name('li')
             for li in li_list:
-                single_class_div = WebDriverWait(li, 15, 0.5).until(
-                        EC.presence_of_element_located((By.CLASS_NAME, 'list-p')))
-                class_name = single_class_div.find_element_by_tag_name('h3').text
-                class_id = single_class_div.find_element_by_tag_name('h3').get_attribute('data-id')
-                learn_detail = single_class_div.find_elements_by_class_name('learndetail')
-                credit_hours = learn_detail[0].find_elements_by_tag_name('em')[0].text
-                credit = learn_detail[0].find_elements_by_tag_name('em')[1].text
-                em1 = learn_detail[1].find_elements_by_tag_name('em')[1]
-                conditions_of_completion = em1.text
-                learning_progress = learn_detail[1].find_element_by_tag_name('div').text.replace('\n', '').replace(' ', '')
-                '''
                 try:
-                    learning_progress = re.match('课程学习(\d*)\%', learning_progress_text).group(1)
+                    single_class_div = WebDriverWait(li, 15, 0.5).until(
+                            EC.presence_of_element_located((By.CLASS_NAME, 'list-p')))
+                    class_name = single_class_div.find_element_by_tag_name('h3').text
+                    class_id = single_class_div.find_element_by_tag_name('h3').get_attribute('data-id')
+                    learn_detail = single_class_div.find_elements_by_class_name('learndetail')
+                    credit_hours = learn_detail[0].find_elements_by_tag_name('em')[0].text
+                    credit = learn_detail[0].find_elements_by_tag_name('em')[1].text
+                    em1 = learn_detail[1].find_elements_by_tag_name('em')[1]
+                    conditions_of_completion = em1.text
+                    learning_progress = learn_detail[1].find_element_by_tag_name('div').text.replace('\n', '').replace(' ', '')
+                    '''
+                    try:
+                        learning_progress = re.match('课程学习(\d*)\%', learning_progress_text).group(1)
+                    except:
+                        learning_progress = learning_progress_text
+                    '''
+                    print(class_name+','+class_id+','+credit+','+conditions_of_completion+','+learning_progress)
+                    f.write(class_name + ',')
+                    f.write(class_id + ',')
+                    f.write(credit + ',')
+                    f.write(conditions_of_completion + ',')
+                    f.write(learning_progress + '\n')
                 except:
-                    learning_progress = learning_progress_text
-                '''
-                print(class_name+','+class_id+','+credit+','+conditions_of_completion+','+learning_progress)
-                f.write(class_name + ',')
-                f.write(class_id + ',')
-                f.write(credit + ',')
-                f.write(conditions_of_completion + ',')
-                f.write(learning_progress + '\n')
+                    error_page_list.append(current_page)
+                    error_classes_name_list.append(class_name)
+                    error_classes_id_list.append(class_id)
+                    print("第{}页报错".format(current_page))
             if last_page > 1:
                 if current_page < last_page:
                     # next_page = chrome.find_element_by_class_name('pag-next-page')
+
                     next_page = WebDriverWait(chrome, 30, 0.5).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, '#LearningTaskPagination > div > div:nth-child(4) > button')))
                     next_page.click()
-                    current_page += 1
-                    time.sleep(3)
+                    time.sleep(5)
+            current_page += 1
+        print("报错的页码有：{}".format(error_page_list))
+        print("报错的课程名称有：{}".format(error_classes_name_list))
+        print("报错的课程id有：{}".format(error_classes_id_list))
 
 
 if __name__ == "__main__":
