@@ -8,7 +8,7 @@
 * 点击右侧Release找到最新版本压缩包下载，其中包含一切必要文件，开箱即用
 * **安装Firefox后第一次打开，请立马在【设置-常规-Firefox更新】中<font color="#dd0000">关闭其自动更新</font><br />**
 ---
-**点击下方图片查看视频教程**
+**点击下方图片查看视频教程<br />**
 [![点击查看视频教程](https://picture.runtofree.link/picture/2023/10/a47b0e2e56f17ce3d7156663f7e88724.png)](https://www.bilibili.com/video/BV1da4y1Q73w)
 ## 进阶使用说明<br>
 ### 1.  环境配置：<br>
